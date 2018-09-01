@@ -3,70 +3,71 @@
 #include <FastLED.h>
 
 const char *airports[] = {
-  "KUKI", // order of LEDs, starting with 0
-  "KSTS",
-  "KO69",
-  "KDVO",
-  "KHAF",
-  "KSFO",
-  "KWVI",
-  "KMRY",
-  "KSNS",
-  "KCVH",
-  "KRHV",
-  "KSJC",
-  "KNUQ",
-  "KSQL",
-  "KHWD",
-  "KOAK",
-  "KAPC",
-  "KVCB",
-  "KSUU",
-  "KCCR",
-  "KLVK",
-  "KC83",
-  "KSCK",
-  "KMOD",
-  "KMER",
-  "KMCE",
-  "KMAE",
-  "KFCH",
-  "KFAT",
-  "KNLC",
-  "KHJO",
-  "KPTV",
-  "KVIS",
-  "KO32",
-  "KBIH",
-  "KMMH",
-  "KBAN",
-  "KCPU",
-  "KJAQ",
-  "KMHR",
-  "KSAC",
-  "KEDU",
-  "KSMF",
-  "KMCC",
-  "KPVF",
-  "KTVL",
-  "KMEV",
-  "KCXP",
-  "KNFL",
-  "KLOL", // LED 49, end of first strand
-  "KRNO",
-  "KRTS",
-  "KTRK",
-  "KBLU",
-  "KAUN",
-  "KLHM",
-  "KBAB",
-  "KMYV",
-  "KOVE",
-  "KCIC",
-  "KRBL"
+  "KKIC", // order of LEDs, starting with 1
+  "KMRY", // 2
+  "KSNS", // 3
+  "KCVH", // 4
+  "KE16", // 5
+  "KWVI", // 6
+  "KRHV", // 7
+  "KSJC", // 8
+  "KNUQ", // 9
+  "KPAO", // 10
+  "KSQL", // 11
+  "KHAF", // 12
+  "KSFO", // 13
+  "KOAK", // 14
+  "KHWD", // 15
+  "KLVK", // 16
+  "KC83", // 17
+  "NULL", // 18 empty
+  "KCCR", // 19
+  "KSUU", // 20
+  "KVCB", // 21
+  "KAPC", // 22
+  "KDVO", // 23
+  "KO69", // 24
+  "KSTS", // 25
+  "KHES", // 26
+  "NULL", // 27 empty
+  "KUKI", // 28
+  "KRBL", // 29
+  "NULL", // 30 empty
+  "KCIC", // 31
+  "NULL", // 32 empty
+  "KOVE", // 33
+  "NULL", // 34 empty
+  "KMYV", // 35
+  "KBAB", // 36
+  "KAUN", // 37
+  "KLHM", // 38
+  "KSMF", // 39
+  "KEDU", // 40
+  "KSAC", // 41
+  "KMCC", // 42
+  "KMHR", // 43
+  "NULL", // 44 empty
+  "KPVF", // 45
+  "NULL", // 46 empty
+  "KBLU", // 47
+  "KTRK", // 48
+  "NULL", // 49 empty
+  "KTVL", // 50
+  "KO22", // 51
+  "KCPU", // 52
+  "KJAQ", // 53
+  "NULL", // 54 empty
+  "KSCK", // 55
+  "KMOD", // 56
+  "NULL", // 57 empty
+  "KMER", // 58
+  "KMCE", // 59
+  "NULL", // 60 empty
+  "KMAE", // 61
+  "KO88", // 62
 };
 
-#define NUM_AIRPORTS 61
+#define NUM_AIRPORTS 62 // This is really the number of LEDs
 #define WIND_THRESHOLD 24 // Maximum windspeed for green
 #define LIGHTNING_INTERVAL 5000 // ms - how often should lightning strike; not precise because we sleep in-between
 #define DO_LIGHTNING true // Lightning uses more power, but is cool.
@@ -77,8 +78,8 @@ const char *airports[] = {
 
 #define DEBUG false
 
-char ssid[] = "TODO";        // your network SSID (name)
-char pass[] = "TODO";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "EDITME";        // your network SSID (name)
+char pass[] = "EDITME";    // your network password (use for WPA, or use as key for WEP)
 boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
 boolean lightningLeds[NUM_AIRPORTS] = {0};
 bool isLightning = false;
@@ -93,10 +94,10 @@ int status = WL_IDLE_STATUS;
 
 // Define the array of leds
 CRGB leds[NUM_AIRPORTS];
-#define DATA_PIN    0
+#define DATA_PIN    1
 #define LED_TYPE    WS2811
 #define COLOR_ORDER RGB
-#define BRIGHTNESS 96
+#define BRIGHTNESS 20
 
 WiFiClient client;
 
@@ -222,7 +223,7 @@ bool getMetars() {
   String currentWxstring = "";
   String airportString = airports[0];
   for (int i = 1; i < (NUM_AIRPORTS); i++) {
-    airportString = airportString + "," + airports[i];
+    if (airports[i] != "NULL") airportString = airportString + "," + airports[i];
   }
 
   Serial.println("\nStarting connection to server...");
