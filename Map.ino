@@ -1,9 +1,43 @@
-#include <ArduinoLowPower.h>
-#include <WiFi101.h>
+#include <ESP8266WiFi.h>
 #include <FastLED.h>
+#include <vector>
+using namespace std;
 
-const char *airports[] = {
-  "KKIC", // order of LEDs, starting with 1
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+
+#define NUM_AIRPORTS 62 // This is really the number of LEDs
+#define WIND_THRESHOLD 24 // Maximum windspeed for green
+#define LIGHTNING_INTERVAL 5000 // ms - how often should lightning strike; not precise because we sleep in-between
+#define DO_LIGHTNING true // Lightning uses more power, but is cool.
+#define DO_WINDS true // color LEDs for high winds
+
+#define SERVER "www.aviationweather.gov"
+#define BASE_URI "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecentForEachStation=true&stationString="
+
+#define DEBUG false
+
+const char ssid[] = "EDITME";        // your network SSID (name)
+const char pass[] = "EDITME";    // your network password (use for WPA, or use as key for WEP)
+boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
+unsigned int lightningLoops;
+
+int status = WL_IDLE_STATUS;
+
+#define READ_TIMEOUT 15 // Cancel query if no data received (seconds)
+#define WIFI_TIMEOUT 60 // in seconds
+#define RETRY_TIMEOUT 15000 // in ms
+#define REQUEST_INTERVAL 900000 // in ms (15 min is 900000)
+
+// Define the array of leds
+CRGB leds[NUM_AIRPORTS];
+#define DATA_PIN    5
+#define LED_TYPE    WS2811
+#define COLOR_ORDER RGB
+#define BRIGHTNESS 20
+
+std::vector<unsigned short int> lightningLeds;
+std::vector<String> airports({
+  "KKIC", // order of LEDs, starting with 1 should be KKIC
   "KMRY", // 2
   "KSNS", // 3
   "KCVH", // 4
@@ -64,158 +98,115 @@ const char *airports[] = {
   "KMCE", // 59
   "NULL", // 60 empty
   "KMAE", // 61
-  "KO88", // 62
-};
-
-#define NUM_AIRPORTS 62 // This is really the number of LEDs
-#define WIND_THRESHOLD 24 // Maximum windspeed for green
-#define LIGHTNING_INTERVAL 5000 // ms - how often should lightning strike; not precise because we sleep in-between
-#define DO_LIGHTNING true // Lightning uses more power, but is cool.
-#define DO_WINDS true // color LEDs for high winds
-
-#define SERVER "www.aviationweather.gov"
-#define BASE_URI "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecentForEachStation=true&stationString="
-
-#define DEBUG false
-
-char ssid[] = "EDITME";        // your network SSID (name)
-char pass[] = "EDITME";    // your network password (use for WPA, or use as key for WEP)
-boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
-boolean lightningLeds[NUM_AIRPORTS] = {0};
-bool isLightning = false;
-unsigned int lightningLoops;
-
-int status = WL_IDLE_STATUS;
-
-#define READ_TIMEOUT 15 // Cancel query if no data received (seconds)
-#define WIFI_TIMEOUT 60 // in seconds
-#define RETRY_TIMEOUT 15000 // in ms
-#define REQUEST_INTERVAL 900000 // in ms (15 min is 900000)
-
-// Define the array of leds
-CRGB leds[NUM_AIRPORTS];
-#define DATA_PIN    1
-#define LED_TYPE    WS2811
-#define COLOR_ORDER RGB
-#define BRIGHTNESS 20
-
-WiFiClient client;
+  "KO88" // 62
+});
 
 void setup() {
   //Initialize serial and wait for port to open:
-  Serial.begin(9600);
-//  while (!Serial) {
-//    ; // wait for serial port to connect. Needed for native USB
-//  }
+  Serial.begin(115200);
+  //pinMode(D1, OUTPUT); //Declare Pin mode
+  //while (!Serial) {
+  //    ; // wait for serial port to connect. Needed for native USB
+  //}
 
   pinMode(LED_BUILTIN, OUTPUT); // give us control of the onboard LED
-  digitalWrite(LED_BUILTIN, HIGH);
+  digitalWrite(LED_BUILTIN, LOW);
 
   // Initialize LEDs
-  
-  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_AIRPORTS).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_AIRPORTS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
-
-  // setup power savings
-  WiFi.maxLowPowerMode();
 }
 
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH); // on if we're awake
+  digitalWrite(LED_BUILTIN, LOW); // on if we're awake
   int c;
   const unsigned int lightningLoopThreshold = REQUEST_INTERVAL / LIGHTNING_INTERVAL;
-  
+
+  // Connect to WiFi. We always want a wifi connection for the ESP8266
+  if (WiFi.status() != WL_CONNECTED) {
+    if (ledStatus) fill_solid(leds, NUM_AIRPORTS, CRGB::Orange); // indicate status with LEDs, but only on first run or error
+    FastLED.show();
+    WiFi.mode(WIFI_STA);
+    WiFi.hostname("LED-Sectional");
+    //wifi_set_sleep_type(LIGHT_SLEEP_T); // use light sleep mode for all delays
+    Serial.print("WiFi connecting..");
+    WiFi.begin(ssid, pass);
+    // Wait up to 1 minute for connection...
+    for (c = 0; (c < WIFI_TIMEOUT) && (WiFi.status() != WL_CONNECTED); c++) {
+      Serial.write('.');
+      delay(1000);
+    }
+    if (c >= WIFI_TIMEOUT) { // If it didn't connect within WIFI_TIMEOUT
+      Serial.println("Failed. Will retry...");
+      fill_solid(leds, NUM_AIRPORTS, CRGB::Orange);
+      FastLED.show();
+      ledStatus = true;
+      return;
+    }
+    Serial.println("OK!");
+    if (ledStatus) fill_solid(leds, NUM_AIRPORTS, CRGB::Purple); // indicate status with LEDs
+    FastLED.show();
+    ledStatus = false;
+  }
+
   // Do some lightning
-  if (DO_LIGHTNING && isLightning) {
+  if (DO_LIGHTNING && lightningLeds.size() > 0) {
     lightningLoops++;
-    CRGB lightning[NUM_AIRPORTS];
-    for (int i = 0; i < NUM_AIRPORTS; i++) {
-      if (lightningLeds[i] == true) {
-        lightning[i] = leds[i]; // temporarily store original color
-        leds[i] = CRGB::White; // set to white briefly
-      }
+    Serial.print("Loop: ");
+    Serial.println(lightningLoops);
+    std::vector<CRGB> lightning(lightningLeds.size());
+    for (unsigned short int i = 0; i < lightningLeds.size(); ++i) {
+      unsigned short int currentLed = lightningLeds[i];
+      lightning[i] = leds[currentLed]; // temporarily store original color
+      leds[currentLed] = CRGB::White; // set to white briefly
     }
     FastLED.show();
     delay(25);
-    for (int i = 0; i < NUM_AIRPORTS; i++) {
-      if (lightningLeds[i] == true) {
-        leds[i] = lightning[i]; // restore original color
-      }
+    for (unsigned short int i = 0; i < lightningLeds.size(); ++i) {
+      unsigned short int currentLed = lightningLeds[i];
+      leds[currentLed] = lightning[i]; // restore original color
     }
     FastLED.show();
-    digitalWrite(LED_BUILTIN, LOW);
-    LowPower.deepSleep(LIGHTNING_INTERVAL - 200); // pause during the interval
-    delay(200);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(LIGHTNING_INTERVAL); // pause during the interval
   }
 
-  if (!isLightning || !DO_LIGHTNING || lightningLoops >= lightningLoopThreshold) {
-    Serial.print("Iterating at: ");
-    Serial.println(millis());
+  if (lightningLeds.size() == 0 || !DO_LIGHTNING || lightningLoops >= lightningLoopThreshold) {
     if (DEBUG) {
       fill_gradient_RGB(leds, NUM_AIRPORTS, CRGB::Red, CRGB::Blue); // Just let us know we're running
       FastLED.show();
-   }
-    
-    if(WiFi.status() != WL_CONNECTED) {
-      if (ledStatus) fill_solid(leds, NUM_AIRPORTS, CRGB::Orange); // indicate status with LEDs, but only on first run or error
+    }
+
+    Serial.println("Getting METARs ...");
+    if (getMetars()) {
+      Serial.println("Refreshing LEDs.");
       FastLED.show();
-      Serial.print("WiFi connecting..");
-      WiFi.begin(ssid, pass);
-      // Wait up to 1 minute for connection...
-      for(c=0; (c < WIFI_TIMEOUT) && (WiFi.status() != WL_CONNECTED); c++) {
-        Serial.write('.');
-        delay(1000);
-      }
-      if(c >= WIFI_TIMEOUT) { // If it didn't connect within WIFI_TIMEOUT
-        Serial.println("Failed. Will retry...");
-        fill_solid(leds, NUM_AIRPORTS, CRGB::Orange);
-        FastLED.show();
-        ledStatus = true;
-        return;
-      }
-      Serial.println("OK!");
-      printWiFiStatus();
-      if (ledStatus) fill_solid(leds, NUM_AIRPORTS, CRGB::Purple); // indicate status with LEDs
-      FastLED.show();
-      ledStatus = false;
-      Serial.println("Getting METARs ...");
-      if (getMetars()) {
-        WiFi.end();
-        if (DO_LIGHTNING && isLightning) {
-          lightningLoops = 0;
-          Serial.print("There is lightning, so no long sleep at ");
-          Serial.println(millis());
-        } else {
-          Serial.print("No lightning; Going into sleep at: ");
-          Serial.println(millis());
-          Serial.print(", sleep time: ");
-          Serial.println(REQUEST_INTERVAL);
-          digitalWrite(LED_BUILTIN, LOW);
-          LowPower.deepSleep(REQUEST_INTERVAL - 10000); // for some reason this never works on first run
-          delay(10000); // delay 10 seconds to give it time to go
-        }
+      if (DO_LIGHTNING && lightningLeds.size() > 0) {
+        lightningLoops = 0;
+        Serial.println("There is lightning, so no long sleep.");
       } else {
-        LowPower.idle(RETRY_TIMEOUT); // try again if unsuccessful
+        Serial.print("No lightning; Going into sleep for: ");
+        Serial.println(REQUEST_INTERVAL);
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(REQUEST_INTERVAL); // delay 10 seconds to give it time to go
       }
+    } else {
+      delay(RETRY_TIMEOUT); // try again if unsuccessful
     }
   }
 }
 
-bool getMetars() {
+bool getMetars(){
+  lightningLeds.clear(); // clear out existing lightning LEDs since they're global
+  fill_solid(leds, NUM_AIRPORTS, CRGB::Black); // Set everything to black just in case there is no report
   uint32_t t;
   char c;
-  struct ledConditions {
-    int wind;
-    String condition;
-    String wxstring;
-  } airportLeds[NUM_AIRPORTS] {0, "Unreported", "None"};
-  boolean timedOut = false;
   boolean readingAirport = false;
   boolean readingCondition = false;
   boolean readingWind = false;
   boolean readingWxstring = false;
 
-  int led = 99;
+  unsigned short int led = 99;
   String currentAirport = "";
   String currentCondition = "";
   String currentLine = "";
@@ -226,17 +217,24 @@ bool getMetars() {
     if (airports[i] != "NULL") airportString = airportString + "," + airports[i];
   }
 
+  WiFiClientSecure client;
+
   Serial.println("\nStarting connection to server...");
   // if you get a connection, report back via serial:
-  if (client.connectSSL(SERVER, 443)) {
-    Serial.print("GET ");
-    Serial.print(BASE_URI);
-    Serial.print(airportString);
-    Serial.println(" HTTP/1.1");
-    Serial.print("Host: ");
-    Serial.println(SERVER);
-    Serial.println("Connection: close");
-    Serial.println();
+  if (!client.connect(SERVER, 443)) {
+    Serial.println("Connection failed!");
+    client.stop();
+    return false;
+  } else {
+    Serial.println("Connected ...");
+    /*    Serial.print("GET ");
+        Serial.print(BASE_URI);
+        Serial.print(airportString);
+        Serial.println(" HTTP/1.1");
+        Serial.print("Host: ");
+        Serial.println(SERVER);
+        Serial.println("Connection: close");
+        Serial.println();*/
     // Make a HTTP request, and print it to console:
     client.print("GET ");
     client.print(BASE_URI);
@@ -253,33 +251,39 @@ bool getMetars() {
     Serial.print("Getting data");
 
     while (!client.connected()) {
-      if((millis() - t) >= (READ_TIMEOUT * 1000)) {
+      if ((millis() - t) >= (READ_TIMEOUT * 1000)) {
         Serial.println("---Timeout---");
-        timedOut = true;
-        break;
+        client.stop();
+        return false;
       }
       Serial.print(".");
       delay(1000);
     }
 
     Serial.println();
-    
-    while(client.connected()) {
-      if((c = client.read()) >= 0) {
+
+    while (client.connected()) {
+      if ((c = client.read()) >= 0) {
         currentLine += c;
         if (c == '\n') currentLine = "";
         if (currentLine.endsWith("<station_id>")) { // start paying attention
+          if (led != 99) { // we assume we are recording results at each change in airport; 99 means no airport
+            doColor(currentAirport, led, currentWind.toInt(), currentCondition, currentWxstring);
+          }
           currentAirport = ""; // Reset everything when the airport changes
           readingAirport = true;
           currentCondition = "";
           currentWind = "";
+          currentWxstring = "";
         } else if (readingAirport) {
           if (!currentLine.endsWith("<")) {
             currentAirport += c;
           } else {
             readingAirport = false;
-            for (int i = 0; i < NUM_AIRPORTS; i++) {
-              if (String(airports[i]) == currentAirport) led = i;
+            for (unsigned short int i = 0; i < NUM_AIRPORTS; i++) {
+              if (airports[i] == currentAirport) {
+                led = i;
+              }
             }
           }
         } else if (currentLine.endsWith("<wind_speed_kt>")) {
@@ -289,7 +293,6 @@ bool getMetars() {
             currentWind += c;
           } else {
             readingWind = false;
-            airportLeds[led].wind = currentWind.toInt();
           }
         } else if (currentLine.endsWith("<flight_category>")) {
           readingCondition = true;
@@ -298,7 +301,6 @@ bool getMetars() {
             currentCondition += c;
           } else {
             readingCondition = false;
-            airportLeds[led].condition = currentCondition;
           }
         } else if (currentLine.endsWith("<wx_string>")) {
           readingWxstring = true;
@@ -307,73 +309,48 @@ bool getMetars() {
             currentWxstring += c;
           } else {
             readingWxstring = false;
-            airportLeds[led].wxstring = currentWxstring;
           }
-        }      
-      t = millis(); // Reset timeout clock
-      } else if((millis() - t) >= (READ_TIMEOUT * 1000)) {
+        }
+        t = millis(); // Reset timeout clock
+      } else if ((millis() - t) >= (READ_TIMEOUT * 1000)) {
         Serial.println("---Timeout---");
-        timedOut = true;
         fill_solid(leds, NUM_AIRPORTS, CRGB::Cyan); // indicate status with LEDs
         FastLED.show();
         ledStatus = true;
-        break;
+        client.stop();
+        return false;
       }
-    }
-
-    if(!timedOut) { //Refresh LEDs if it was successful
-      isLightning = false; // set to False so we can make it true if there is any
-      for (int i = 0; i < NUM_AIRPORTS; i++) {
-        Serial.print(airports[i]);
-        Serial.print(": ");
-        Serial.print(airportLeds[i].condition);
-        Serial.print(" ");
-        Serial.print(airportLeds[i].wind);
-        Serial.print("kts LED ");
-        Serial.print(i);
-        Serial.print(" WX: ");
-        Serial.println(airportLeds[i].wxstring);
-        if (airportLeds[i].wxstring.indexOf("TS") != -1) {
-          Serial.println("... found lightning!");
-          lightningLeds[i] = true;
-          isLightning = true;
-        } else {
-          lightningLeds[i] = false;
-        }
-        if (airportLeds[i].condition == "LIFR") leds[i] = CRGB::Magenta;
-        else if (airportLeds[i].condition == "IFR") leds[i] = CRGB::Red;
-        else if (airportLeds[i].condition == "MVFR") leds[i] = CRGB::Blue;
-        else if (airportLeds[i].condition == "VFR") {
-          if (airportLeds[i].wind > WIND_THRESHOLD && DO_WINDS) {
-            leds[i] = CRGB::Yellow;
-          } else {
-            leds[i] = CRGB::Green;
-          }
-        }
-      }
-      Serial.println("Writing to LEDs.");
-      FastLED.show();
     }
   }
-
   client.stop();
-  if (timedOut) return false;
-  else return true;
+  return true;
 }
 
-void printWiFiStatus() {
-  // print the SSID of the network you're attached to:
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
+void doColor(String identifier, unsigned short int led, int wind, String condition, String wxstring) {
+  CRGB color;
+  Serial.print(identifier);
+  Serial.print(": ");
+  Serial.print(condition);
+  Serial.print(" ");
+  Serial.print(wind);
+  Serial.print("kts LED ");
+  Serial.print(led);
+  Serial.print(" WX: ");
+  Serial.println(wxstring);
+  if (wxstring.indexOf("TS") != -1) {
+    Serial.println("... found lightning!");
+    lightningLeds.push_back(led);
+  }
+  if (condition == "LIFR") color = CRGB::Magenta;
+  else if (condition == "IFR") color = CRGB::Red;
+  else if (condition == "MVFR") color = CRGB::Blue;
+  else if (condition == "VFR") {
+    if (wind > WIND_THRESHOLD && DO_WINDS) {
+      color = CRGB::Yellow;
+    } else {
+      color = CRGB::Green;
+    }
+  } else color = CRGB::Black;
 
-  // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-
-  // print the received signal strength:
-  long rssi = WiFi.RSSI();
-  Serial.print("signal strength (RSSI):");
-  Serial.print(rssi);
-  Serial.println(" dBm");
+  leds[led] = color;
 }
