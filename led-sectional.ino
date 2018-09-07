@@ -103,7 +103,7 @@ std::vector<String> airports({
 
 void setup() {
   //Initialize serial and wait for port to open:
-  Serial.begin(115200);
+  Serial.begin(74880);
   //pinMode(D1, OUTPUT); //Declare Pin mode
   //while (!Serial) {
   //    ; // wait for serial port to connect. Needed for native USB
@@ -127,7 +127,7 @@ void loop() {
     if (ledStatus) fill_solid(leds, NUM_AIRPORTS, CRGB::Orange); // indicate status with LEDs, but only on first run or error
     FastLED.show();
     WiFi.mode(WIFI_STA);
-    WiFi.hostname("LED-Sectional");
+    WiFi.hostname("LED Sectional " + WiFi.macAddress());
     //wifi_set_sleep_type(LIGHT_SLEEP_T); // use light sleep mode for all delays
     Serial.print("WiFi connecting..");
     WiFi.begin(ssid, pass);
