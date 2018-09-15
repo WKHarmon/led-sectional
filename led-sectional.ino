@@ -229,14 +229,14 @@ bool getMetars(){
     return false;
   } else {
     Serial.println("Connected ...");
-    /*    Serial.print("GET ");
-        Serial.print(BASE_URI);
-        Serial.print(airportString);
-        Serial.println(" HTTP/1.1");
-        Serial.print("Host: ");
-        Serial.println(SERVER);
-        Serial.println("Connection: close");
-        Serial.println();*/
+    Serial.print("GET ");
+    Serial.print(BASE_URI);
+    Serial.print(airportString);
+    Serial.println(" HTTP/1.1");
+    Serial.print("Host: ");
+    Serial.println(SERVER);
+    Serial.println("Connection: close");
+    Serial.println();
     // Make a HTTP request, and print it to console:
     client.print("GET ");
     client.print(BASE_URI);
@@ -333,6 +333,8 @@ bool getMetars(){
       }
     }
   }
+  // need to doColor this for the last airport
+  doColor(currentAirport, led, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
   client.stop();
   return true;
 }
