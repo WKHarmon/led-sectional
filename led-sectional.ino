@@ -6,7 +6,7 @@ using namespace std;
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
 #define NUM_AIRPORTS 62 // This is really the number of LEDs
-#define WIND_THRESHOLD 24 // Maximum windspeed for green
+#define WIND_THRESHOLD 25 // Maximum windspeed for green
 #define LIGHTNING_INTERVAL 5000 // ms - how often should lightning strike; not precise because we sleep in-between
 #define DO_LIGHTNING true // Lightning uses more power, but is cool.
 #define DO_WINDS true // color LEDs for high winds
@@ -204,6 +204,7 @@ bool getMetars(){
   boolean readingAirport = false;
   boolean readingCondition = false;
   boolean readingWind = false;
+  boolean readingGusts = false;
   boolean readingWxstring = false;
 
   unsigned short int led = 99;
@@ -211,6 +212,7 @@ bool getMetars(){
   String currentCondition = "";
   String currentLine = "";
   String currentWind = "";
+  String currentGusts = "";
   String currentWxstring = "";
   String airportString = airports[0];
   for (int i = 1; i < (NUM_AIRPORTS); i++) {
@@ -268,12 +270,13 @@ bool getMetars(){
         if (c == '\n') currentLine = "";
         if (currentLine.endsWith("<station_id>")) { // start paying attention
           if (led != 99) { // we assume we are recording results at each change in airport; 99 means no airport
-            doColor(currentAirport, led, currentWind.toInt(), currentCondition, currentWxstring);
+            doColor(currentAirport, led, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
           }
           currentAirport = ""; // Reset everything when the airport changes
           readingAirport = true;
           currentCondition = "";
           currentWind = "";
+          currentGusts = "";
           currentWxstring = "";
         } else if (readingAirport) {
           if (!currentLine.endsWith("<")) {
@@ -293,6 +296,14 @@ bool getMetars(){
             currentWind += c;
           } else {
             readingWind = false;
+          }
+        } else if (currentLine.endsWith("<wind_gust_kt>")) {
+          readingGusts = true;
+        } else if (readingGusts) {
+          if (!currentLine.endsWith("<")) {
+            currentGusts += c;
+          } else {
+            readingGusts = false;
           }
         } else if (currentLine.endsWith("<flight_category>")) {
           readingCondition = true;
@@ -326,13 +337,15 @@ bool getMetars(){
   return true;
 }
 
-void doColor(String identifier, unsigned short int led, int wind, String condition, String wxstring) {
+void doColor(String identifier, unsigned short int led, int wind, int gusts, String condition, String wxstring) {
   CRGB color;
   Serial.print(identifier);
   Serial.print(": ");
   Serial.print(condition);
   Serial.print(" ");
   Serial.print(wind);
+  Serial.print("G");
+  Serial.print(gusts);
   Serial.print("kts LED ");
   Serial.print(led);
   Serial.print(" WX: ");
@@ -345,7 +358,7 @@ void doColor(String identifier, unsigned short int led, int wind, String conditi
   else if (condition == "IFR") color = CRGB::Red;
   else if (condition == "MVFR") color = CRGB::Blue;
   else if (condition == "VFR") {
-    if (wind > WIND_THRESHOLD && DO_WINDS) {
+    if ((wind > WIND_THRESHOLD || gusts > WIND_THRESHOLD) && DO_WINDS) {
       color = CRGB::Yellow;
     } else {
       color = CRGB::Green;
