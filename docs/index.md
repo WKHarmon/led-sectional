@@ -74,7 +74,7 @@ Some of the tools I have are linked, but any one will work.
 * Optional: [Crimper for JST connectors](https://amzn.to/2QFYEds)
 
 # Software
-The code I used for this project is available at https://github.com/WKHarmon/led-sectional. It is designed to use the Arduino IDE and should be relatively easy to adapt for your own purposes. I should mention that I'm not an engineer--I just hack together code to try to make it work, so I'm sure the code is ugly.
+The code I used for this project is available at [https://github.com/WKHarmon/led-sectional](https://github.com/WKHarmon/led-sectional). It is designed to use the Arduino IDE and should be relatively easy to adapt for your own purposes. I should mention that I'm not an engineer--I just hack together code to try to make it work, so I'm sure the code is ugly.
 
 The program uses standard definitions for VFR, MVFR, IFR, and LIFR, but I also set it to show yellow if an airport is VFR but winds are greater than 25 nots, and an airport will strobe white every 5 seconds if there are thunderstorms in the area. These can be disabled by setting `DO_WINDS` and `DO_LIGHTNING` to false respectively.
 
@@ -141,7 +141,7 @@ In the picture you can see that I cut the strand because the next LED in the str
 
 
 # Final Details
-Because I don't have good tools or really any skills with woodworking, I purchased a frame from http://www.pictureframes.com. Their SP8 frame has 2 1/4" of depth, which is plenty to contain the electronics. For my 24"x36 1/2" project, it cost me about $120 shipped for the frame, and it came fully assembled with mounting hardware (but no glass), which I thought was a pretty good details.
+Because I don't have good tools or really any skills with woodworking, I purchased a frame from [http://www.pictureframes.com](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame). Their SP8 frame has 2 1/4" of depth, which is plenty to contain the electronics. For my 24"x36 1/2" project, it cost me about $120 shipped for the frame, and it came fully assembled with mounting hardware (but no glass), which I thought was a pretty good details.
 
 I mounted the map on a place on my wall previously had a wall sconce light, so I was able to re-use the existing power rather than running new power or running a cable.
 
