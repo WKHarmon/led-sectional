@@ -76,9 +76,9 @@ Some of the tools I have are linked, but any one will work.
 # Software
 The code I used for this project is available at [https://github.com/WKHarmon/led-sectional](https://github.com/WKHarmon/led-sectional). It is designed to use the Arduino IDE and should be relatively easy to adapt for your own purposes. I should mention that I'm not an engineer--I just hack together code to try to make it work, so I'm sure the code is ugly.
 
-The program uses standard definitions for VFR, MVFR, IFR, and LIFR, but I also set it to show yellow if an airport is VFR but winds are greater than 25 nots, and an airport will strobe white every 5 seconds if there are thunderstorms in the area. These can be disabled by setting `DO_WINDS` and `DO_LIGHTNING` to false respectively.
+The program uses standard definitions for VFR, MVFR, IFR, and LIFR, but I also set it to show yellow if an airport is VFR but winds are greater than 25 knots, and an airport will strobe white every 5 seconds if there are thunderstorms in the area. These can be disabled by setting `DO_WINDS` and `DO_LIGHTNING` to false respectively.
 
-On power on, all LEDs will show orange initially. Once the controller is connected to the WiFi network, they'll turn purple, and then they'll show the airport colors once the data is downloaded in parsed. LEDs for airports that have not reported weather in the last 3 hours, or that don't have a clear flight category will be turned off.
+On power on, all LEDs will show orange initially. Once the controller is connected to the WiFi network, they'll turn purple, and then they'll show the airport colors once the data is downloaded in parsed. LEDs for airports that have not reported weather in the last 3 hours, or that don't have a clear flight category will be turned off. Weather is updated every 15 minutes, and the update rate can be adjusted in `REQUEST_INTERVAL`.
 
 You'll need to install the following in order to program the board:
 * [ESP8266 Core](https://github.com/esp8266/Arduino) is necessary to use the ESP8266-compatible controller in the Arduino IDE.
