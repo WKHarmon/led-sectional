@@ -19,7 +19,7 @@ Here are a few pictures of the final product:
 The materials themselves are pretty cheap--you should be able to get everything you need aside from the frame for less than $150. The frame cost will vary depending on how big you want to make the sectional. The tools may add some cost if you don't already have what you need.
 
 ## Materials
-I've linked to Amazon for most of the electronic items. You should be able to buy them for cheaper and in smaller quantites from Aliexpress or another similar store if you're willing to wait for the shipment. (In the interest of full disclosuer, the Amazon links do have my affiliate tags, but I'm not really trying to make any money here.)
+I've linked to Amazon for most of the electronic items. You should be able to buy them for cheaper and in smaller quantites from Aliexpress or another similar store if you're willing to wait for the shipment. (In the interest of full disclosure, the Amazon links do have my affiliate tags, but I'm not really trying to make any money here.)
 * [WEMOS D1 Mini Lite](https://www.aliexpress.com/store/product/WEMOS-D1-mini-Lite-V1-0-0-WIFI-Internet-of-Things-development-board-based-ESP8285-1MB/1331105_32795857574.html?spm=2114.12010615.8148356.30.10027c8csIW2n0)
     * If you have time to wait for the shipment, support them and buy from the official store, but [this version on Amazon](https://www.amazon.com/gp/product/B07BK435ZW/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK435ZW&linkId=895aa52a462e2ac4b0134cc4385e1402) also worked fine.
     * The non-Lite version will work fine, and this code should be pretty adaptable to any Arduino-compatible board with WiFi.
