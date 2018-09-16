@@ -48,7 +48,7 @@ I've linked to Amazon for most of the electronic items. You should be able to bu
 * Optional: 3-pin [JST-XH Connectors](https://amzn.to/2QANmqO) and [JST-SM Connectors](https://amzn.to/2xiQ3o2) if you want a interface between the microcontroller and the LED strand(s)
 * Optional: [Velcro](https://amzn.to/2MAEjTu) to affix the power supply and controller to the board
 * Optional components recommended by NeoPixels that I didn't add:
-    * 1000 µF, 6.3V or higher capacitor - put this between the 5v and Ground on the power adapter to mitigate spikes on power-on (I didn't do this)
+    * 1000 µF, 6.3V or higher capacitor - put this between the 5v and Ground on the power adapter to mitigate spikes on power-on
     * 220 Ohm resistor - put this on the data wire between the level shifter HV1 pin and the data wire on the connector to the LED strand to also mitigate power spikes
 
 
