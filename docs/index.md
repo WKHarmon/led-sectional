@@ -139,7 +139,7 @@ In the picture you can see that I cut the strand because the next LED in the str
 ![Final Back](https://wkharmon.github.io/led-sectional/images/Final back.jpg)
 
 
-#Final Details
+# Final Details
 Because I don't have good tools or really any skills with woodworking, I purchased a frame from http://www.pictureframes.com. Their SP8 frame has 2 1/4" of depth, which is plenty to contain the electronics. For my 24"x36 1/2" project, it cost me about $120 shipped for the frame, and it came fully assembled with mounting hardware (but no glass), which I thought was a pretty good details.
 
 I mounted the map on a place on my wall previously had a wall sconce light, so I was able to re-use the existing power rather than running new power or running a cable.
