@@ -12,6 +12,6 @@ There were small gaps in the how-to details for some of them so I figured it mig
 
 # Pictures
 Here are a few pictures of the final product:
-![Final Product](https://wkharmon.github.io/led-sectional/images/Final 1.jpg | 250)
-![Final Product](https://wkharmon.github.io/led-sectional/images/Final 2.jpg | 250)
-![Final Product](https://wkharmon.github.io/led-sectional/images/Final 3.jpg | 250)
+![Final Product](https://wkharmon.github.io/led-sectional/images/Final 1.jpg)
+![Final Product](https://wkharmon.github.io/led-sectional/images/Final 2.jpg)
+![Final Product](https://wkharmon.github.io/led-sectional/images/Final 3.jpg)
