@@ -47,8 +47,9 @@ I've linked to Amazon for most of the electronic items. You should be able to bu
 * Optional: [80mm x 50mm x 20mm Project Enclosure](https://www.amazon.com/gp/product/B071WRYXHT/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B071WRYXHT&linkId=c31a81d8e941299dbfce5364d464440e)
 * Optional: 3-pin [JST-XH Connectors](https://amzn.to/2QANmqO) and [JST-SM Connectors](https://amzn.to/2xiQ3o2) if you want a interface between the microcontroller and the LED strand(s)
 * Optional: [Velcro](https://amzn.to/2MAEjTu) to affix the power supply and controller to the board
-* Optional: 1000 µF, 6.3V or higher capacitor
-* Optional: 220 Ohm resistor
+* Optional components recommended by NeoPixels that I didn't add:
+    * 1000 µF, 6.3V or higher capacitor - put this between the 5v and Ground on the power adapter to mitigate spikes on power-on (I didn't do this)
+    * 220 Ohm resistor - put this on the data wire between the level shifter HV1 pin and the data wire on the connector to the LED strand to also mitigate power spikes
 
 
 You'll also need either:
