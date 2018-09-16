@@ -10,6 +10,7 @@ LED Sectional
     * [Mounting the sectionals](#mounting-the-sectionals)
     * [Drilling](#drilling)
     * [Glueing LEDs](#glueing-leds)
+* [Final Details](#final-details)
 
 This project is adapted from a few other very similar ones:
 * [http://blog.dylanhrush.com/2017/07/live-sectional-map.html](http://blog.dylanhrush.com/2017/07/live-sectional-map.html)
