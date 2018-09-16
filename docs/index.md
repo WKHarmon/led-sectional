@@ -19,11 +19,11 @@ Here are a few pictures of the final product:
 # Materials Required
 Here are the materials that I used:
 * [WEMOS D1 Mini Lite](https://www.aliexpress.com/store/product/WEMOS-D1-mini-Lite-V1-0-0-WIFI-Internet-of-Things-development-board-based-ESP8285-1MB/1331105_32795857574.html?spm=2114.12010615.8148356.30.10027c8csIW2n0)
-** If you have time to wait for the shipment, support them and buy from the official store, but [this version on Amazon](https://www.amazon.com/gp/product/B07BK435ZW/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK435ZW&linkId=895aa52a462e2ac4b0134cc4385e1402) worked fine.
-** The non-Lite version will work fine, and this code should be pretty adaptable to any Arduino-compatible board with WiFi.
+    * If you have time to wait for the shipment, support them and buy from the official store, but [this version on Amazon](https://www.amazon.com/gp/product/B07BK435ZW/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK435ZW&linkId=895aa52a462e2ac4b0134cc4385e1402) worked fine.
+    * The non-Lite version will work fine, and this code should be pretty adaptable to any Arduino-compatible board with WiFi.
 * 3.3V to 5V Level Shifter
-** [74HCT245](https://www.aliexpress.com/item/10PCS-SN74HCT245N-DIP20-SN74HCT245-DIP-74HCT245-74HCT245N-DIP-20-new-and-original-IC/32537892034.html?spm=a2g0s.9042311.0.0.58d84c4d3QyyCc) are pretty well-regarded
-** [Amazon Alternative](https://www.amazon.com/gp/product/B07CWKY2CB/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07CWKY2CB&linkId=f71fa879c7e9dea55436cb533517a00a) - These also worked fine, but they may be too slow if you run a ton of LEDs.
+    * [74HCT245](https://www.aliexpress.com/item/10PCS-SN74HCT245N-DIP20-SN74HCT245-DIP-74HCT245-74HCT245N-DIP-20-new-and-original-IC/32537892034.html?spm=a2g0s.9042311.0.0.58d84c4d3QyyCc) are pretty well-regarded
+    * [Amazon Alternative](https://www.amazon.com/gp/product/B07CWKY2CB/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07CWKY2CB&linkId=f71fa879c7e9dea55436cb533517a00a) - These also worked fine, but they may be too slow if you run a ton of LEDs.
 * [5V DC Power Supply](https://www.amazon.com/gp/product/B078RT3ZPS/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B078RT3ZPS&linkId=5997f784bd7a0995cc69fed33f39129a)
 ** This is more power than you really need--you could get a smaller one if you'd prefer.
 * [DC Barrel Connectors](https://www.amazon.com/gp/product/B06XNR1ZVL/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B06XNR1ZVL&linkId=7abd8ecd6cebd232fbd0de9b00091e0e)
@@ -36,11 +36,13 @@ Here are the materials that I used:
 You'll also need either:
 * Sectional(s) from the FAA - remember that they're two sided so you may need two to get full coverage
 * [Hard Tempered Board](https://www.homedepot.com/p/Hardboard-Tempered-Common-1-8-in-x-2-ft-x-4-ft-Actual-0-125-in-x-23-75-in-x-47-75-in-7005015/202088786) or MDF
-** The tempered board has a really nice surface for glueing, but it doesn't drill cleanly. Some others use MDF which might be cleaner.
+    * The tempered board has a really nice surface for glueing, but it doesn't drill cleanly. Some others use MDF which might be cleaner.
 * [3M Super 77 Spray Adhesive](https://www.homedepot.com/p/3M-16-7-oz-Super-77-Multi-Purpose-Spray-Adhesive-77-24VOC30/301619194)
 * [SP8 Picture Frame](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame)
-** This is one of the only super-deep frames I've seen that are easily orderable online.
+    * This is one of the only super-deep frames I've seen that are easily orderable online.
 * Optional: [PVA Adhesive](https://amzn.to/2OtIGBo) if you have a seam between sectionals
+
 OR
+
 * Have a [digital file](https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/vfr/) of the sectional printed and mounted on foamcore at [PictureFrames.com](http://www.pictureframes.com)
-** Use the [SP8 Picture Frame](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame) for plenty of depth.
+    * Use the [SP8 Picture Frame](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame) for plenty of depth.
