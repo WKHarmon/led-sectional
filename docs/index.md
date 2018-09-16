@@ -24,8 +24,8 @@ I've linked to Amazon for most of the electronic items. You should be able to bu
     * If you have time to wait for the shipment, support them and buy from the official store, but [this version on Amazon](https://www.amazon.com/gp/product/B07BK435ZW/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK435ZW&linkId=895aa52a462e2ac4b0134cc4385e1402) also worked fine.
     * The non-Lite version will work fine, and this code should be pretty adaptable to any Arduino-compatible board with WiFi.
 * 3.3V to 5V Level Shifter
-    * [74HCT245](https://www.aliexpress.com/item/10PCS-SN74HCT245N-DIP20-SN74HCT245-DIP-74HCT245-74HCT245N-DIP-20-new-and-original-IC/32537892034.html?spm=a2g0s.9042311.0.0.58d84c4d3QyyCc) are pretty well-regarded
-    * [Amazon Alternative](https://www.amazon.com/gp/product/B07CWKY2CB/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07CWKY2CB&linkId=f71fa879c7e9dea55436cb533517a00a) - These also worked fine, but they may be too slow if you run a ton of LEDs.
+    * [WeiMeet 4 Channel Level Converter](https://www.amazon.com/gp/product/B07CWKY2CB/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07CWKY2CB&linkId=f71fa879c7e9dea55436cb533517a00a) - These are what I used (and will document here), but they're considered to be a bit slow. You may run into problems if you have a ton of LEDs.
+    * [74HCT245](https://www.aliexpress.com/item/10PCS-SN74HCT245N-DIP20-SN74HCT245-DIP-74HCT245-74HCT245N-DIP-20-new-and-original-IC/32537892034.html?spm=a2g0s.9042311.0.0.58d84c4d3QyyCc) are faster if you would prefer to use them instead.
 * [WS2811 LED Strand(s)](https://amzn.to/2QxYzbD)
     * I'm also trying out [these](https://www.aliexpress.com/item/Mokungit-50pcs-12MM-WS2811-Full-Color-Square-Pixel-LED-Module-Lighting-String-5V-12V-RGB-Waterproof/32803645847.html?spm=a2g0s.9042311.0.0.41a84c4d6VpNsN) and [these](https://www.aliexpress.com/item/DC5V-12mm-SM16703-RGB-LED-Pixel-module-IP68-waterproof-full-color-50pcs-a-string-perforator-alphabet/32817144776.html?spm=a2g0s.9042311.0.0.41a84c4d6VpNsN) for a lower profile.
 * [5V DC Power Supply](https://www.amazon.com/gp/product/B078RT3ZPS/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B078RT3ZPS&linkId=5997f784bd7a0995cc69fed33f39129a) - This is more power than you really need--you could get a smaller one if you'd prefer.
@@ -60,3 +60,75 @@ Some of the tools I have are linked, but any one will work.
 * Drill with a 8mm drill bit
 * [Glue gun](https://amzn.to/2Qz1p03) with plenty of [glue](https://amzn.to/2pcJWOB)
 * Optional: [Crimper for JST connectors](https://amzn.to/2QFYEds)
+
+# Software
+The code I used for this project is available at https://github.com/WKHarmon/led-sectional. It is designed to use the Arduino IDE and should be relatively easy to adapt for your own purposes. I should mention that I'm not an engineer--I just hack together code to try to make it work, so I'm sure the code is ugly.
+
+The program uses standard definitions for VFR, MVFR, IFR, and LIFR, but I also set it to show yellow if an airport is VFR but winds are greater than 25 nots, and an airport will strobe white every 5 seconds if there are thunderstorms in the area. These can be disabled by setting `DO_WINDS` and `DO_LIGHTNING` to false respectively.
+
+On power on, all LEDs will show orange initially. Once the controller is connected to the WiFi network, they'll turn purple, and then they'll show the airport colors once the data is downloaded in parsed. LEDs for airports that have not reported weather in the last 3 hours, or that don't have a clear flight category will be turned off.
+
+You'll need to install the following in order to program the board:
+* [ESP8266 Core](https://github.com/esp8266/Arduino) is necessary to use the ESP8266-compatible controller in the Arduino IDE.
+* [CH340G Driver](https://wiki.wemos.cc/downloads) is necessary for your computer to see the board
+* Within the Library Manager in the Arduino IDE, you'll also need to install the [FastLED Library])(http://fastled.io/).
+
+Once you have all of that installed, you'll need to set the Board to `LOLIN(WEMOS) D1 mini Lite` under Tools in the Arduino IDE.
+
+The `airports` vector contains all of the airports used for the project in the order in which they appear in the LED strand. `NULL` is used when we have unused LEDs in the strand. You'll also need to edit in the SSID and Password for your WiFi network.
+
+# Assembly
+## Soldering and Wiring
+The Wemos D1 Mini Lite can accept 5V as input voltage, but the GPIO pins run at 3.3v. The WS2811 LED strand is expecting 5V on the data line, so it is necessary to convert the GPIO 3.3v to the WS2811 5V using a logic level shifter. (In some cases it may work without the shifter, but using one is the safer bet.) Below is a breadboard diagram for wiring it all up:
+
+![Breadboard Diagram](https://wkharmon.github.io/led-sectional/images/Wemos PCB 1_bb.png)
+
+I've diagramed on a breadboard for simplicity, but I used a 3cm x 7cm PCB. In the diagram, the (optional) JST-XH connector on the right goes to the WS2811 LED strand. If you don't want to bother with the connector, you can just solder the wires from the LED strand to the PCB.
+
+![Controller on PCB](https://wkharmon.github.io/led-sectional/images/Microcontroller on PCB.jpg)
+
+The data flow on the WS2811 strand is directional. In the LED pixel itself, the PCB will be marked with an arrow on one side. That arrow indicates the input side of the pixel. Connect the microcontroller to the side of the strand such that the wires from the controller are connected to the input side of the pixel (with the arrow), matching the 5V, Data, and Ground lines on the strand to those on the controller.
+
+The WS2811 LED strand has pigtails for injecting power on the ends of the strand as well. Solder a DC barrel connector for power to the pigtails nearest the microcontroller. The microcontroller will receive power from its conenction to the LED strand.
+
+Once I had it all connected up, I created a small pigtail with a JST-XH connector on one side and a JST-SM connector on the other side (which matches the connectors that came with the LED strand) to make it easy to attach and detach the LED strand, then I put it in an enclosure box.
+
+![Enclosure](https://wkharmon.github.io/led-sectional/images/Enclosure.jpg)
+
+## Mounting the sectionals
+This section is only necessary if you bought actual sectionals and didn't take the shortcut and have a sectional printed and pre-mounted.
+
+When I bought the Hard Tempered Board noted above, I had Home Depot cut it to the desired size. The combined halves of the San Francisco sectional were just over 36" high, and the board itself was 24" wide, so I just decided to use that width.
+
+I cut off the bottom white space of the northern sectional, then I taped the sectionals at the seam using scotch tape, and measured which 24" of the sectional width I actually wanted. I then put the board on top of the sectional and used an Exacto knife to cut off the excess parts of the sectional, but leaving about 1" on each side of the sectional just in case I didn't get it perfectly centered when glueing.
+
+Next, I sprayed the shiny side of the board with the 3M Spray Adhesive, waited about a minute per the directions, and then laid the sectional flat on the board so it would adhere. I used a ruler to flatten out any spots that were not flat.
+
+Once the glue was dried, I cut off the excess parts of the sectional using an exacto knife, and then glued the flap created by the seam between the two sectionals using PVA Adhesive.
+
+## Drilling
+**Important: Don't use ForeFlight to determine where METARs are available.** ForeFlight aggregates several sources of weather data together, and contains several airports that are not available via the aviationweather.gov API. I suggest using the METAR map at aviationweather.gov to determine where to drill.
+
+Once I figured out where I wanted to drill, I used an 8mm drill bit to drill through the sectional and the backing board together. This resulted in some holes that weren't super clean.
+
+![Rough Edges](https://wkharmon.github.io/led-sectional/images/Rough edges.jpg)
+
+I specifically wanted my LEDs to stick out, but if you didn't then adjusting the drill bit size and using a countersink bit would allow you to align them with the front of the board.
+
+After I drilled, I then took a file and an exacto knife to clean up the edges to make it look significantly better. I suspect that MDF or foamcore backing would be a lot cleaner and might not need that step.
+
+## Glueing LEDs
+Once all of the holes were drilled, I rough fit the LEDs throught he holes in the back to try to find the optimal routing. IT's not important what order they're in yet--I'm just trying to waste the fewest LEDs. Once I figured it out, I started gluing a few at a time using the hot glue gun.
+
+![First Glued LEDs](https://wkharmon.github.io/led-sectional/images/First glued leds.jpg)
+
+In the picture you can see that I cut the strand because the next LED in the strand was too far from the previous one, but eventually I realized that LEDs are cheap, so it is much easier to just leave the LEDs on the strand and not use them than to cut the strand and splice in a jumper. The final product looked like this:
+
+![Final Back](https://wkharmon.github.io/led-sectional/images/Final back.jpg)
+
+#Final Details
+Because I don't have good tools or really any skills with woodworking, I purchased a frame from http://www.pictureframes.com. Their SP8 frame has 2 1/4" of depth, which is plenty to contain the electronics. For my 24"x36 1/2" project, it cost me about $120 shipped for the frame, and it came fully assembled with mounting hardware (but no glass), which I thought was a pretty good details.
+
+I mounted the map on a place on my wall previously had a wall sconce light, so I was able to re-use the existing power rather than running new power or running a cable.
+
+Enjoy!
