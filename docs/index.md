@@ -1,6 +1,15 @@
 LED Sectional
 =============
-This document is a work-in-progress. I'm adding to it as I have time.
+* [Pictures](#pictures)
+* [Things you'll need](#things-youll-need)
+    * [Materials](#materials)
+    * [Tools](#tools)
+* [Software](#software)
+* [Assembly](#assembly)
+    * [Soldering and Wiring](#soldering-and-wiring)
+    * [Mounting the sectionals](#mounting-the-sectionals)
+    * [Drilling](#drilling)
+    * [Glueing LEDs](#glueing-leds)
 
 This project is adapted from a few other very similar ones:
 * [http://blog.dylanhrush.com/2017/07/live-sectional-map.html](http://blog.dylanhrush.com/2017/07/live-sectional-map.html)
