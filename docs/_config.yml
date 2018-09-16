@@ -1,3 +1,3 @@
 theme: jekyll-theme-slate
 title: LED Sectional Project
-description: This project uses an ESP8266-based controller to download METARs for a set of airports and assign a color to a LED representing each airport so that they can be put into an aviation sectional map.
+description: This project uses an ESP8266-compatible controller to download METARs for a set of airports and assign a color to a LED representing each airport so that they can be put into an aviation sectional map.

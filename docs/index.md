@@ -1,12 +1,11 @@
 LED Sectional
 =============
-
-This project uses an ESP8266-based microcontroller to download METARs from a set of airprots and assign a color to a LED representing the current weather at each airport. The LEDs are placed in an aviation sectional and that looks great on a wall.
+This document is a work-in-progress. I'm adding to it as I have time.
 
 This project is adapted from a few other very similar ones:
-* http://blog.dylanhrush.com/2017/07/live-sectional-map.html
-* https://www.reddit.com/r/flying/comments/7avr8q/flight_conditions_sectional_wall_art_thing/
-* https://pplaviationuk.wordpress.com/creating-a-metar-map/
+* [http://blog.dylanhrush.com/2017/07/live-sectional-map.html](http://blog.dylanhrush.com/2017/07/live-sectional-map.html)
+* [https://www.reddit.com/r/flying/comments/7avr8q/flight_conditions_sectional_wall_art_thing/](https://www.reddit.com/r/flying/comments/7avr8q/flight_conditions_sectional_wall_art_thing/)
+* [https://pplaviationuk.wordpress.com/creating-a-metar-map/](https://pplaviationuk.wordpress.com/creating-a-metar-map/)
 
 There were small gaps in the how-to details for some of them so I figured it might be helpful to fully document how I did it. I also opted to use a microcontroller rather than a Raspberry Pi, so mine is different in that way too.
 
@@ -20,8 +19,9 @@ Here are a few pictures of the final product:
 The materials themselves are pretty cheap--you should be able to get everything you need aside from the frame for less than $150. The frame cost will vary depending on how big you want to make the sectional. The tools may add some cost if you don't already have what you need.
 
 ## Materials
+I've linked to Amazon for most of the electronic items. You should be able to buy them for cheaper and in smaller quantites from Aliexpress or another similar store if you're willing to wait for the shipment. (In the interest of full disclosuer, the Amazon links do have my affiliate tags, but I'm not really trying to make any money here.)
 * [WEMOS D1 Mini Lite](https://www.aliexpress.com/store/product/WEMOS-D1-mini-Lite-V1-0-0-WIFI-Internet-of-Things-development-board-based-ESP8285-1MB/1331105_32795857574.html?spm=2114.12010615.8148356.30.10027c8csIW2n0)
-    * If you have time to wait for the shipment, support them and buy from the official store, but [this version on Amazon](https://www.amazon.com/gp/product/B07BK435ZW/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK435ZW&linkId=895aa52a462e2ac4b0134cc4385e1402) worked fine.
+    * If you have time to wait for the shipment, support them and buy from the official store, but [this version on Amazon](https://www.amazon.com/gp/product/B07BK435ZW/ref=as_li_tl?ie=UTF8&tag=wkharmon-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=B07BK435ZW&linkId=895aa52a462e2ac4b0134cc4385e1402) also worked fine.
     * The non-Lite version will work fine, and this code should be pretty adaptable to any Arduino-compatible board with WiFi.
 * 3.3V to 5V Level Shifter
     * [74HCT245](https://www.aliexpress.com/item/10PCS-SN74HCT245N-DIP20-SN74HCT245-DIP-74HCT245-74HCT245N-DIP-20-new-and-original-IC/32537892034.html?spm=a2g0s.9042311.0.0.58d84c4d3QyyCc) are pretty well-regarded
@@ -38,6 +38,7 @@ The materials themselves are pretty cheap--you should be able to get everything 
 * Optional: 1000 µF, 6.3V or higher capacitor
 * Optional: 220 Ohm resistor
 
+
 You'll also need either:
 * Sectional(s) from the FAA - remember that they're two sided so you may need two to get full coverage
 * [Hard Tempered Board](https://www.homedepot.com/p/Hardboard-Tempered-Common-1-8-in-x-2-ft-x-4-ft-Actual-0-125-in-x-23-75-in-x-47-75-in-7005015/202088786) or MDF
@@ -47,7 +48,7 @@ You'll also need either:
     * This is one of the only super-deep frames I've seen that are easily orderable online.
 * Optional: [PVA Adhesive](https://amzn.to/2OtIGBo) if you have a seam between sectionals
 
-OR
+**OR**
 
 * Have a [digital file](https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/vfr/) of the sectional printed and mounted on foamcore at [PictureFrames.com](http://www.pictureframes.com). If you do this, be sure to maintain the 300 ppi from the original file in order to keep the sectional to scale (assuming you want that at least).
     * Use the [SP8 Picture Frame](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame) for plenty of depth.
