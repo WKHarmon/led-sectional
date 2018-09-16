@@ -52,7 +52,7 @@ I've linked to Amazon for most of the electronic items. You should be able to bu
     * 220 Ohm resistor - put this on the data wire between the level shifter HV1 pin and the data wire on the connector to the LED strand to also mitigate power spikes
 
 
-You'll also need either:
+**You'll also need either:**
 * Sectional(s) from the FAA - remember that they're two sided so you may need two to get full coverage
 * [Hard Tempered Board](https://www.homedepot.com/p/Hardboard-Tempered-Common-1-8-in-x-2-ft-x-4-ft-Actual-0-125-in-x-23-75-in-x-47-75-in-7005015/202088786) or MDF
     * The tempered board has a really nice surface for glueing, but it doesn't drill cleanly. Some others use MDF which might be cleaner.
