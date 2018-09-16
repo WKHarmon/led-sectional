@@ -83,7 +83,7 @@ On power on, all LEDs will show orange initially. Once the controller is connect
 You'll need to install the following in order to program the board:
 * [ESP8266 Core](https://github.com/esp8266/Arduino) is necessary to use the ESP8266-compatible controller in the Arduino IDE.
 * [CH340G Driver](https://wiki.wemos.cc/downloads) is necessary for your computer to see the board
-* Within the Library Manager in the Arduino IDE, you'll also need to install the [FastLED Library])(http://fastled.io/).
+* Within the Library Manager in the Arduino IDE, you'll also need to install the [FastLED Library](http://fastled.io/).
 
 Once you have all of that installed, you'll need to set the Board to `LOLIN(WEMOS) D1 mini Lite` under Tools in the Arduino IDE.
 
