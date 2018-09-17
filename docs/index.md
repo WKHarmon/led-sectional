@@ -13,9 +13,9 @@ LED Sectional
 * [Final Details](#final-details)
 
 This project is adapted from a few other very similar ones:
-* [http://blog.dylanhrush.com/2017/07/live-sectional-map.html](http://blog.dylanhrush.com/2017/07/live-sectional-map.html)
-* [https://www.reddit.com/r/flying/comments/7avr8q/flight_conditions_sectional_wall_art_thing/](https://www.reddit.com/r/flying/comments/7avr8q/flight_conditions_sectional_wall_art_thing/)
-* [https://pplaviationuk.wordpress.com/creating-a-metar-map/](https://pplaviationuk.wordpress.com/creating-a-metar-map/)
+* [Live sectional map](http://blog.dylanhrush.com/2017/07/live-sectional-map.html)
+* [Flight conditions sectional wall art thing](https://www.reddit.com/r/flying/comments/7avr8q/flight_conditions_sectional_wall_art_thing/)
+* [Creating a METAR map](https://pplaviationuk.wordpress.com/creating-a-metar-map/)
 
 There were small gaps in the how-to details for some of them so I figured it might be helpful to fully document how I did it. I also opted to use a microcontroller rather than a Raspberry Pi, so mine is different in that way too.
 
@@ -67,7 +67,7 @@ I've linked to Amazon for most of the electronic items. You should be able to bu
     * Use the [SP8 Picture Frame](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame) for plenty of depth.
 
 ## Tools
-Some of the tools I have are linked, but any one will work.
+Here are the tools you'll need. I've provided links to the ones I use, but any set of good tools will work.
 * [Soldering iron](https://amzn.to/2QALNsW) and solder
 * [Wire stripper](https://amzn.to/2xlO9TD)
 * Drill with a 8mm drill bit
