@@ -37,7 +37,7 @@ CRGB leds[NUM_AIRPORTS];
 
 std::vector<unsigned short int> lightningLeds;
 std::vector<String> airports({
-  "KKIC", // order of LEDs, starting with 1 should be KKIC
+  "KKIC", // order of LEDs, starting with 1 should be KKIC; use VFR, WVFR, MVFR, IFR, LIFR for key; NULL for no airport
   "KMRY", // 2
   "KSNS", // 3
   "KCVH", // 4
@@ -216,7 +216,13 @@ bool getMetars(){
   String currentWxstring = "";
   String airportString = airports[0];
   for (int i = 1; i < (NUM_AIRPORTS); i++) {
-    if (airports[i] != "NULL") airportString = airportString + "," + airports[i];
+    // Use this opportunity to set colors for LEDs in our key then build the request string
+    if (airports[i] == "VFR") leds[i] = CRGB::Green;
+    else if (airports[i] == "WVFR") leds[i] = CRGB::Yellow;
+    else if (airports[i] == "MVFR") leds[i] = CRGB::Blue;
+    else if (airports[i] == "IFR") leds[i] = CRGB::Red;
+    else if (airports[i] == "LIFR") leds[i] = CRGB::Magenta;
+    else if (airports[i] != "NULL") airportString = airportString + "," + airports[i];
   }
 
   WiFiClientSecure client;
@@ -356,7 +362,7 @@ void doColor(String identifier, unsigned short int led, int wind, int gusts, Str
     Serial.println("... found lightning!");
     lightningLeds.push_back(led);
   }
-  if (condition == "LIFR") color = CRGB::Magenta;
+  if (condition == "LIFR" || identifier == "LIFR") color = CRGB::Magenta;
   else if (condition == "IFR") color = CRGB::Red;
   else if (condition == "MVFR") color = CRGB::Blue;
   else if (condition == "VFR") {
