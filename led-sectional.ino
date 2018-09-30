@@ -5,7 +5,7 @@ using namespace std;
 
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
-#define NUM_AIRPORTS 41 // This is really the number of LEDs
+#define NUM_AIRPORTS 62 // This is really the number of LEDs
 #define WIND_THRESHOLD 25 // Maximum windspeed for green
 #define LIGHTNING_INTERVAL 5000 // ms - how often should lightning strike; not precise because we sleep in-between
 #define DO_LIGHTNING true // Lightning uses more power, but is cool.
