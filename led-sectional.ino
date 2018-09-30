@@ -37,47 +37,68 @@ CRGB leds[NUM_AIRPORTS];
 
 std::vector<unsigned short int> lightningLeds;
 std::vector<String> airports({
-  "LIFR", // order of LEDs; use VFR, WVFR, MVFR, IFR, LIFR for key; NULL for no airport
-  "IFR",
-  "MVFR",
-  "VFR",
-  "NULL", // 5
-  "KHAF",
-  "KSFO",
-  "KOAK",
-  "KCCR",
-  "KAPC", // 10
-  "KDVO",
-  "KO69",
-  "KSTS",
-  "NULL",
-  "NULL", // 15
-  "KSUU",
-  "KVCB",
-  "KEDU",
-  "KSAC",
-  "KMHR", // 20
-  "NULL",
-  "NULL",
-  "KSCK",
-  "KMOD",
-  "NULL", // 25
-  "KC83",
-  "KLVK",
-  "KHWD",
-  "KSQL",
-  "KPAO", // 30
-  "KNUQ",
-  "KSJC",
-  "KRHV",
-  "KE16",
-  "KCVH", // 35
-  "KSNS",
-  "KMRY",
-  "KWVI",
-  "NULL",
-  "NULL", // 40
-  "WVFR" // 41
+  "KKIC", // order of LEDs, starting with 1 should be KKIC; use VFR, WVFR, MVFR, IFR, LIFR for key; NULL for no airport
+  "KMRY", // 2
+  "KSNS", // 3
+  "KCVH", // 4
+  "KE16", // 5
+  "KWVI", // 6
+  "KRHV", // 7
+  "KSJC", // 8
+  "KNUQ", // 9
+  "KPAO", // 10
+  "KSQL", // 11
+  "KHAF", // 12
+  "KSFO", // 13
+  "KOAK", // 14
+  "KHWD", // 15
+  "KLVK", // 16
+  "KC83", // 17
+  "NULL", // 18 empty
+  "KCCR", // 19
+  "KSUU", // 20
+  "KVCB", // 21
+  "KAPC", // 22
+  "KDVO", // 23
+  "KO69", // 24
+  "KSTS", // 25
+  "KHES", // 26
+  "NULL", // 27 empty
+  "KUKI", // 28
+  "KRBL", // 29
+  "NULL", // 30 empty
+  "KCIC", // 31
+  "NULL", // 32 empty
+  "KOVE", // 33
+  "NULL", // 34 empty
+  "KMYV", // 35
+  "KBAB", // 36
+  "KAUN", // 37
+  "KLHM", // 38
+  "KSMF", // 39
+  "KEDU", // 40
+  "KSAC", // 41
+  "KMCC", // 42
+  "KMHR", // 43
+  "NULL", // 44 empty
+  "KPVF", // 45
+  "NULL", // 46 empty
+  "KBLU", // 47
+  "KTRK", // 48
+  "NULL", // 49 empty
+  "KTVL", // 50
+  "KO22", // 51
+  "KCPU", // 52
+  "KJAQ", // 53
+  "NULL", // 54 empty
+  "KSCK", // 55
+  "KMOD", // 56
+  "NULL", // 57 empty
+  "KMER", // 58
+  "KMCE", // 59
+  "NULL", // 60 empty
+  "KMAE", // 61
+  "KO88" // 62
 });
 
 void setup() {
