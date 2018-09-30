@@ -5,7 +5,7 @@ using namespace std;
 
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
-#define NUM_AIRPORTS 39 // This is really the number of LEDs
+#define NUM_AIRPORTS 41 // This is really the number of LEDs
 #define WIND_THRESHOLD 25 // Maximum windspeed for green
 #define LIGHTNING_INTERVAL 5000 // ms - how often should lightning strike; not precise because we sleep in-between
 #define DO_LIGHTNING true // Lightning uses more power, but is cool.
@@ -75,7 +75,9 @@ std::vector<String> airports({
   "KSNS",
   "KMRY",
   "KWVI",
-  "WVFR" // 39
+  "NULL",
+  "NULL", // 40
+  "WVFR" // 41
 });
 
 void setup() {
@@ -191,15 +193,15 @@ bool getMetars(){
   String currentWind = "";
   String currentGusts = "";
   String currentWxstring = "";
-  String airportString = airports[0];
+  String airportString = "";
+  bool firstAirport = true;
   for (int i = 1; i < (NUM_AIRPORTS); i++) {
-    // Use this opportunity to set colors for LEDs in our key then build the request string
-    if (airports[i] == "VFR") leds[i] = CRGB::Green;
-    else if (airports[i] == "WVFR") leds[i] = CRGB::Yellow;
-    else if (airports[i] == "MVFR") leds[i] = CRGB::Blue;
-    else if (airports[i] == "IFR") leds[i] = CRGB::Red;
-    else if (airports[i] == "LIFR") leds[i] = CRGB::Magenta;
-    else if (airports[i] != "NULL") airportString = airportString + "," + airports[i];
+    if (airports[i] != "NULL" && airports[i] != "VFR" && airports[i] != "MVFR" && airports[i] != "WVFR" && airports[i] != "IFR" && airports[i] != "LIFR") {
+      if (firstAirport) {
+        firstAirport = false;
+        airportString = airports[i];
+      } else airportString = airportString + "," + airports[i];
+    }
   }
 
   WiFiClientSecure client;
@@ -318,6 +320,17 @@ bool getMetars(){
   }
   // need to doColor this for the last airport
   doColor(currentAirport, led, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
+
+  // Do the key LEDs now if they exist
+  for (int i = 0; i < (NUM_AIRPORTS); i++) {
+    // Use this opportunity to set colors for LEDs in our key then build the request string
+    if (airports[i] == "VFR") leds[i] = CRGB::Green;
+    else if (airports[i] == "WVFR") leds[i] = CRGB::Yellow;
+    else if (airports[i] == "MVFR") leds[i] = CRGB::Blue;
+    else if (airports[i] == "IFR") leds[i] = CRGB::Red;
+    else if (airports[i] == "LIFR") leds[i] = CRGB::Magenta;
+  }
+
   client.stop();
   return true;
 }
