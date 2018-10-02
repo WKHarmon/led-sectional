@@ -55,7 +55,7 @@ I've linked to Amazon for most of the electronic items. You should be able to bu
 **You'll also need either:**
 * Sectional(s) from the FAA - remember that they're two sided so you may need two to get full coverage
 * [Hard Tempered Board](https://www.homedepot.com/p/Hardboard-Tempered-Common-1-8-in-x-2-ft-x-4-ft-Actual-0-125-in-x-23-75-in-x-47-75-in-7005015/202088786) or MDF
-    * The tempered board has a really nice surface for glueing, but it doesn't drill cleanly. Some others use MDF which might be cleaner.
+    * Note: In my second iteration I used 3/16" foamcore instead of the board, and it worked well and made the entire thing much lighter.
 * [3M Super 77 Spray Adhesive](https://www.homedepot.com/p/3M-16-7-oz-Super-77-Multi-Purpose-Spray-Adhesive-77-24VOC30/301619194)
 * [SP8 Picture Frame](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame)
     * This is one of the only super-deep frames I've seen that are easily orderable online.
@@ -70,7 +70,8 @@ I've linked to Amazon for most of the electronic items. You should be able to bu
 Here are the tools you'll need. I've provided links to the ones I use, but any set of good tools will work.
 * [Soldering iron](https://amzn.to/2QALNsW) and solder
 * [Wire stripper](https://amzn.to/2xlO9TD)
-* Drill with a 8mm drill bit
+* Drill with a 7mm drill bit
+    * In a future iteration I intend to try using [leather punches](https://amzn.to/2Iz3F3N) to try to get a cleaner cut.
 * [Glue gun](https://amzn.to/2Qz1p03) with plenty of [glue](https://amzn.to/2pcJWOB)
 * Optional: [Crimper for JST connectors](https://amzn.to/2QFYEds)
 
@@ -88,7 +89,7 @@ You'll need to install the following in order to program the board:
 
 Once you have all of that installed, you'll need to set the Board to `LOLIN(WEMOS) D1 mini Lite` under Tools in the Arduino IDE.
 
-The `airports` vector contains all of the airports used for the project in the order in which they appear in the LED strand. `NULL` is used when we have unused LEDs in the strand. You'll also need to edit in the SSID and Password for your WiFi network.
+The `airports` vector contains all of the airports used for the project in the order in which they appear in the LED strand. `NULL` is used when we have unused LEDs in the strand. If you'd like to add a key, you can mark those LEDs as `VFR`, `WVFR`, `MVFR`, `IFR`, and `LIFR`. You'll also need to edit in the SSID and Password for your WiFi network.
 
 
 # Assembly
@@ -100,6 +101,8 @@ The Wemos D1 Mini Lite can accept 5V as input voltage, but the GPIO pins run at 
 I've diagramed on a breadboard for simplicity, but I used a 3cm x 7cm PCB. In the diagram, the (optional) JST-XH connector on the right goes to the WS2811 LED strand. If you don't want to bother with the connector, you can just solder the wires from the LED strand to the PCB.
 
 ![Controller on PCB](https://wkharmon.github.io/led-sectional/images/Microcontroller on PCB.jpg)
+
+If you have a smaller number of LEDs on your map, it may be possible to power the LED strand from the Micro USB port on the Wemos D1 Mini rather than connecting an external power supply. No wiring changes are necessary, but be sure to not connect an external power supply when the Micro USB port is connected. Also be aware that the Wemos D1 Mini has a 0.5A fuse on the 5V line so it would need to be a really small number of LEDs.
 
 The data flow on the WS2811 strand is directional. In the LED pixel itself, the PCB will be marked with an arrow on one side. That arrow indicates the input side of the pixel. Connect the microcontroller to the side of the strand such that the wires from the controller are connected to the input side of the pixel (with the arrow), matching the 5V, Data, and Ground lines on the strand to those on the controller.
 
@@ -145,5 +148,11 @@ In the picture you can see that I cut the strand because the next LED in the str
 Because I don't have good tools or really any skills with woodworking, I purchased a frame from [http://www.pictureframes.com](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame). Their SP8 frame has 2 1/4" of depth, which is plenty to contain the electronics. For my 24"x36 1/2" project, it cost me about $120 shipped for the frame, and it came fully assembled with mounting hardware (but no glass), which I thought was a pretty good details.
 
 I mounted the map on a place on my wall previously had a wall sconce light, so I was able to re-use the existing power rather than running new power or running a cable.
+
+Finally, just for fun I had some PCBs printed up for this project which obviate the need for adding a bunch of wires onto a generic PCB:
+
+![PCB](https://wkharmon.github.io/led-sectional/images/PCB.jpg)
+
+I'm thinking about putting together a kit for $50 which would include all of the parts that are annoying to try to get, or have to be bought in bulk (the PCB, controller, capacitor, resistor, level shifter, and connectors). If you're interested in such a thing, [shoot me an email](mailto:kyle@kyleharmon.com).
 
 Enjoy!
