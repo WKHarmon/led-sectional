@@ -103,7 +103,7 @@ std::vector<String> airports({
 
 void setup() {
   //Initialize serial and wait for port to open:
-  Serial.begin(74880);
+  Serial.begin(115200);
   //pinMode(D1, OUTPUT); //Declare Pin mode
   //while (!Serial) {
   //    ; // wait for serial port to connect. Needed for native USB
@@ -225,8 +225,8 @@ bool getMetars(){
     }
   }
 
-  WiFiClientSecure client;
-
+  BearSSL::WiFiClientSecure client;
+  client.setInsecure();
   Serial.println("\nStarting connection to server...");
   // if you get a connection, report back via serial:
   if (!client.connect(SERVER, 443)) {
@@ -272,6 +272,7 @@ bool getMetars(){
 
     while (client.connected()) {
       if ((c = client.read()) >= 0) {
+        yield(); // Otherwise the WiFi stack can crash
         currentLine += c;
         if (c == '\n') currentLine = "";
         if (currentLine.endsWith("<station_id>")) { // start paying attention
