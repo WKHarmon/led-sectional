@@ -3,11 +3,10 @@ LED Sectional
 * [LED Sectional](#led-sectional)
 * [Pictures](#pictures)
 * [Things you'll need](#things-youll-need)
-    * [Materials](#materials)
-        * [Electronics](#electronics)
+    * [Electronics](#electronics)
         * [LED Sectional Kit](#led-sectional-kit)
         * [Buying a la carte](#buying-a-la-carte)
-        * [Map and Frame](#map-and-frame)
+    * [Map and Frame](#map-and-frame)
     * [Tools](#tools)
 * [Software](#software)
 * [Assembly](#assembly)
@@ -35,14 +34,13 @@ Here are a few pictures of the final product:
 # Things you'll need
 The materials themselves are pretty cheap--you should be able to get everything you need aside from the frame for less than $100. The frame cost will vary depending on how big you want to make the sectional. The tools may add some cost if you don't already have what you need.
 
-## Materials
-### Electronics
-#### LED Sectional Kit
+## Electronics
+### LED Sectional Kit
 I've created a LED Sectional Kit that is pretty inexpensive and has the bulk of the electronics that you need in order to get started.
 
 [Click here to find out more information about the kit.](kit.md)
 
-#### Buying a la carte
+### Buying a la carte
 I've linked to Amazon for most of the electronic items. You should be able to buy them for cheaper and in smaller quantites from Aliexpress or another similar store if you're willing to wait for the shipment. (In the interest of full disclosure, the Amazon links do have my affiliate tags, but I'm not really trying to make any money here.)
 * [WEMOS D1 Mini Lite](https://www.aliexpress.com/store/product/WEMOS-D1-mini-Lite-V1-0-0-WIFI-Internet-of-Things-development-board-based-ESP8285-1MB/1331105_32795857574.html?spm=2114.12010615.8148356.30.10027c8csIW2n0)
     * If you have time to wait for the shipment, support them and buy from the official store, but [this version on Amazon](https://amzn.to/2R4Pjio) also worked fine.
@@ -62,7 +60,7 @@ I've linked to Amazon for most of the electronic items. You should be able to bu
     * 1000 µF, 6.3V or higher capacitor - put this between the 5v and Ground on the power adapter to mitigate spikes on power-on
     * 220 Ohm resistor - put this on the data wire between the level shifter HV1 pin and the data wire on the connector to the LED strand to also mitigate power spikes
 
-### Map and Frame
+## Map and Frame
 **You'll also need either:**
 * Sectional(s) from the FAA - remember that they're two sided so you may need two to get full coverage
 * 3/8" Foamcore or [Hard Tempered Board](https://www.homedepot.com/p/Hardboard-Tempered-Common-1-8-in-x-2-ft-x-4-ft-Actual-0-125-in-x-23-75-in-x-47-75-in-7005015/202088786) or MDF
