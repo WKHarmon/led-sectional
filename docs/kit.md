@@ -4,11 +4,11 @@ On the [/r/flying subreddit](https://www.reddit.com/r/flying) there was a [great
 ## Ordering
 There are three different ordering links depending on how you'd like your kit configured.
 1. [Buyer programs](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CFKGLG5F2ETDW)
-    * The kit will arrived programmed with a LED test program so you can ensure the strand is working properly. You'll need to program it for your map using the instructions located [here](index.md#software)
+    * The kit will arrived programmed with a LED test program so you can ensure the strand is working properly. You'll need to program it for your map using the instructions located [here](index.md#software).
 2. [Pre-programmed](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=783A474TT9K4G)
     * You'll send me your WiFi username and password, as well as the order in which the airports appear on your map. I'll pre-program the module so all you need to do when you receive it is plug it in. NOTE: If your WiFi username or password changes, you'll need to re-program the module yourself.
 3. [Buyer programs, with an included ambient light sensor](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=67RASVCG8DK5A)
-    * This includes an added ambient light sensor so the map can be program to automatically turn off when the ambient lights are off. I would recommend ONLY adding the light sensor if you plan to put the map in a room where the light will be disruptive at night as this will not significantly impact power usage.
+    * This includes an added ambient light sensor so the map can be programmed to automatically turn off when the ambient lights are off. I would recommend ONLY adding the light sensor if you plan to put the map in a room where the light will be disruptive at night as this will not significantly impact power usage.
 
 **An important note:** I'm not trying to make a profit on these so I am selling these very close to cost. As you can imagine, there's a fair bit of effort involved in putting them together. If you like your kit once you receive it, I would appreciate it if you considered giving a tax deductible donation to the [Upwind Foundation](https://www.upwindscholarship.com/) in my honor.
 
