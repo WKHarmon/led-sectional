@@ -5,12 +5,16 @@ On the [/r/flying subreddit](https://www.reddit.com/r/flying) there was a [great
 There are three different ordering links depending on how you'd like your kit configured.
 1. [Buyer programs](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CFKGLG5F2ETDW)
     * The kit will arrived programmed with a LED test program so you can ensure the strand is working properly. You'll need to program it for your map using the instructions located [here](index.md#software).
+
+    You will need a high-quality Micro USB cable in order to program the board.
 2. [Pre-programmed](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=783A474TT9K4G)
     * You'll send me your WiFi username and password, as well as the order in which the airports appear on your map. I'll pre-program the module so all you need to do when you receive it is plug it in. NOTE: If your WiFi username or password changes, you'll need to re-program the module yourself.
+
+    I'll follow up with you after you order with more information about how all of that will work.
 3. [Buyer programs, with an included ambient light sensor](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=67RASVCG8DK5A)
     * This includes an added ambient light sensor so the map can be programmed to automatically turn off when the ambient lights are off. I would recommend ONLY adding the light sensor if you plan to put the map in a room where the light will be disruptive at night as this will not significantly impact power usage.
 
-**An important note:** I'm not trying to make a profit on these so I am selling these very close to cost. As you can imagine, there's a fair bit of effort involved in putting them together. If you like your kit once you receive it, I would appreciate it if you considered giving a tax deductible donation to the [Upwind Foundation](https://www.upwindscholarship.com/) in my honor.
+**An important note:** I'm not trying to make a profit on these so I am selling these very close to cost. As you can imagine, there's a fair bit of effort involved in putting them together. If you like your kit once you receive it, I would appreciate it if you considered giving a tax deductible donation to the [Upwind Foundation](https://www.upwindscholarship.com/). We're having a bit of a contest to see who can raise the most, so please do mention my name (Kyle Harmon) if you donate.
 
 ## About the Kit
 The kit includes the following:
@@ -19,7 +23,7 @@ The kit includes the following:
     * [330 Ohm Resistor](https://www.digikey.com/product-detail/en/yageo/CFR-25JB-52-330R/330QBK-ND/1636)
     * [1000 µF Capacitor](https://www.digikey.com/product-detail/en/rubycon/25PX1000MEFCT810X16/1189-1583-3-ND/3134863)
     * 2x [JST XH Connectors](https://www.digikey.com/product-detail/en/jst-sales-america-inc/B3B-XH-A-LF-SN/455-2248-ND/1651046)
-    * [74HCT245N Level Shifter](https://www.aliexpress.com/item/5PCS-SN74HCT245N-DIP20-SN74HCT245-DIP-74HCT245-74HCT245N-new-and-original-IC-free-shipping/32537892034.html?spm=a2g0s.9042311.0.0.65834c4dVZ9zG9)
+    * [74HCT245N Level Shifter](https://www.digikey.com/product-detail/en/texas-instruments/SN74HCT245N/296-1612-5-ND/277258)
     * [1N4004 Diode](https://www.digikey.com/product-detail/en/micro-commercial-co/1N4004-TP/1N4004-TPMSTR-ND/773641)
     * [2.1mm x 5.5mm DC Barrel Jack for power](https://www.digikey.com/product-detail/en/cui-inc/PJ-037A/CP-037A-ND/1644545)
 * Custom 3D printed case
