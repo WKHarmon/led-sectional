@@ -10,6 +10,8 @@ There are three different ordering links depending on how you'd like your kit co
 3. [Buyer programs, with an included ambient light sensor](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=67RASVCG8DK5A)
     * This includes an added ambient light sensor so the map can be program to automatically turn off when the ambient lights are off. I would recommend ONLY adding the light sensor if you plan to put the map in a room where the light will be disruptive at night as this will not significantly impact power usage.
 
+**An important note:** I'm not trying to make a profit on these so I am selling these very close to cost. As you can imagine, there's a fair bit of effort involved in putting them together. If you like your kit once you receive it, I would appreciate it if you considered giving a tax deductible donation to the [Upwind Foundation](https://www.upwindscholarship.com/) in my honor.
+
 ## About the Kit
 The kit includes the following:
 * Wemos D1 Mini micro-controller
@@ -23,8 +25,9 @@ The kit includes the following:
 * Custom 3D printed case
 * JST-XH to JST-SM cable for connecting LEDs.
 
-Here's a picture of what you get:
-TODO: Picture goes here
+Here's are some pictures of what you get:
+![Kit board](https://wkharmon.github.io/led-sectional/images/Kit board.jpg)
+![Kit covered](https://wkharmon.github.io/led-sectional/images/Kit covered.jpg)
 
 For the electronics, you'll need to purchase the following items as well:
 * [WS2811 LED Strands](https://amzn.to/2Sng8vF) (choose the 5V version)
@@ -34,6 +37,12 @@ You'll also need to purchase sectionals, backing, glue, etc. to create and mount
 
 ## Using the Kit
 Details on how to upload firmware and use the kit can be found [here](index.md#software).
+
+## Limitations
+There are a couple of limitations to note:
+* This is still a DIY project. I’m trying to make it pretty polished, but it’ll be a little rough around the edges. The color of the case and the board may change.
+* The Wemos modules only support 2.4 GHz WiFi, and you should ensure that you have a solid signal wherever you plan to put the map.
+* I’ve tested this to about 100 LEDs. It shouldn’t have much trouble handling any single sectional, but if you plan to use a much larger area let me know so I can test it ahead of time.
 
 ## Open Source
 Everything about the kit is open source. The code lives [here](https://github.com/WKHarmon/led-sectional/blob/master/led-sectional.ino). If you'd like to make your own PCB, the Eagle files are [here](https://github.com/WKHarmon/led-sectional/tree/master/pcb%20files), and if you have a 3D Printer the STL files for the enclosure are [here](https://github.com/WKHarmon/led-sectional/tree/master/enclosure%20stl%20files).
