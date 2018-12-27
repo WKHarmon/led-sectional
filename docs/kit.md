@@ -2,7 +2,13 @@
 On the [/r/flying subreddit](https://www.reddit.com/r/flying) there was a [great deal of interest](https://www.reddit.com/r/flying/comments/a4yb83/aviation_nerd_jackpot/ebiscca/) in a simple kit for the electronic components that could be used to create a [LED Sectional](index.md). Because of that, I've created a simple kit to help kickstart the process.
 
 ## Ordering
-I'll be setting up a PayPal order link here shortly.
+There are three different ordering links depending on how you'd like your kit configured.
+1. [Buyer programs](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CFKGLG5F2ETDW)
+    * The kit will arrived programmed with a LED test program so you can ensure the strand is working properly. You'll need to program it for your map using the instructions located [here](index.md#software)
+2. [Pre-programmed](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=783A474TT9K4G)
+    * You'll send me your WiFi username and password, as well as the order in which the airports appear on your map. I'll pre-program the module so all you need to do when you receive it is plug it in. NOTE: If your WiFi username or password changes, you'll need to re-program the module yourself.
+3. [Buyer programs, with an included ambient light sensor](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=67RASVCG8DK5A)
+    * This includes an added ambient light sensor so the map can be program to automatically turn off when the ambient lights are off. I would recommend ONLY adding the light sensor if you plan to put the map in a room where the light will be disruptive at night as this will not significantly impact power usage.
 
 ## About the Kit
 The kit includes the following:
