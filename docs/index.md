@@ -36,9 +36,11 @@ The materials themselves are pretty cheap--you should be able to get everything 
 
 ## Electronics
 ### LED Sectional Kit
-I've created a LED Sectional Kit that is pretty inexpensive and has the bulk of the electronics that you need in order to get started.
+I originally wrote this guide with instructions on how to buy all of the electronic components on Amazon, but now I have a kit available that contains all of the electronics except for the power adapter and the LED strands themslves. The kit is significantly cheaper than buying each of the components a la carte since most of the components come in large quantities.
 
 [Click here to find out more information about the kit.](kit.md)
+
+The Amazon links from the original how-to are below in case you'd enjoy doing everything yourself.
 
 ### Buying a la carte
 I've linked to Amazon for most of the electronic items. You should be able to buy them for cheaper and in smaller quantites from Aliexpress or another similar store if you're willing to wait for the shipment. (In the interest of full disclosure, the Amazon links do have my affiliate tags, but I'm not really trying to make any money here.)
