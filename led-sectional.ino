@@ -103,7 +103,7 @@ std::vector<String> airports({
 
 void setup() {
   //Initialize serial and wait for port to open:
-  Serial.begin(115200);
+  Serial.begin(74880);
   //pinMode(D1, OUTPUT); //Declare Pin mode
   //while (!Serial) {
   //    ; // wait for serial port to connect. Needed for native USB
@@ -216,7 +216,7 @@ bool getMetars(){
   String currentWxstring = "";
   String airportString = "";
   bool firstAirport = true;
-  for (int i = 1; i < (NUM_AIRPORTS); i++) {
+  for (int i = 0; i < NUM_AIRPORTS; i++) {
     if (airports[i] != "NULL" && airports[i] != "VFR" && airports[i] != "MVFR" && airports[i] != "WVFR" && airports[i] != "IFR" && airports[i] != "LIFR") {
       if (firstAirport) {
         firstAirport = false;
