@@ -161,7 +161,7 @@ void adjustBrightness() {
 void loop() {
   digitalWrite(LED_BUILTIN, LOW); // on if we're awake
 
-  adjustBrightness();
+  if (USE_LIGHT_SENSOR) adjustBrightness();
 
   int c;
   loops++;
