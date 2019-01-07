@@ -7,9 +7,23 @@ using namespace std;
 
 #define NUM_AIRPORTS 62 // This is really the number of LEDs
 #define WIND_THRESHOLD 25 // Maximum windspeed for green
-#define LIGHTNING_INTERVAL 5000 // ms - how often should lightning strike; not precise because we sleep in-between
+#define LOOP_INTERVAL 5000 // ms - interval between brightness updates and lightning strikes
 #define DO_LIGHTNING true // Lightning uses more power, but is cool.
 #define DO_WINDS true // color LEDs for high winds
+#define REQUEST_INTERVAL 900000 // How often we update. In practice LOOP_INTERVAL is added. In ms (15 min is 900000)
+
+/* This section only applies if you have an ambient light sensor connected */
+#define USE_LIGHT_SENSOR false // set to true if you want to use a light sensor
+#define LIGHTSENSORPIN A0 // A0 is the only valid pin for an analog light sensor
+/* The sketch will automatically scale the light between MIN_BRIGHTNESS and
+MAX_BRIGHTNESS on the ambient light values between MIN_LIGHT and MAX_LIGHT
+Set MIN_BRIGHTNESS and MAX_BRIGHTNESS to the same value to achieve a simple on/off effect. */
+#define MIN_BRIGHTNESS 20 // Recommend values above 3 as colors don't show well below that
+#define MAX_BRIGHTNESS 20 // Recommend values between 20 and 30
+// Light values are a raw reading and don't correlate to lux
+#define MIN_LIGHT 3 // Recommended default is 3
+#define MAX_LIGHT 100 // Recommended default is 100
+/* ----------------------------------------------------------------------- */
 
 #define SERVER "www.aviationweather.gov"
 #define BASE_URI "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecentForEachStation=true&stationString="
@@ -19,21 +33,20 @@ using namespace std;
 const char ssid[] = "EDITME";        // your network SSID (name)
 const char pass[] = "EDITME";    // your network password (use for WPA, or use as key for WEP)
 boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
-unsigned int lightningLoops;
+unsigned int loops;
 
 int status = WL_IDLE_STATUS;
 
 #define READ_TIMEOUT 15 // Cancel query if no data received (seconds)
 #define WIFI_TIMEOUT 60 // in seconds
 #define RETRY_TIMEOUT 15000 // in ms
-#define REQUEST_INTERVAL 900000 // in ms (15 min is 900000)
 
 // Define the array of leds
 CRGB leds[NUM_AIRPORTS];
 #define DATA_PIN    5
 #define LED_TYPE    WS2811
 #define COLOR_ORDER RGB
-#define BRIGHTNESS 20
+#define BRIGHTNESS 20 // 20-30 recommended. If using a light sensor, this is the initial brightness on boot.
 
 std::vector<unsigned short int> lightningLeds;
 std::vector<String> airports({
@@ -112,15 +125,50 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // give us control of the onboard LED
   digitalWrite(LED_BUILTIN, LOW);
 
+  if (USE_LIGHT_SENSOR) {
+    pinMode(LIGHTSENSORPIN, INPUT);
+  }
+
   // Initialize LEDs
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_AIRPORTS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 }
 
+void adjustBrightness() {
+  float reading;
+  byte brightness;
+
+  reading = analogRead(LIGHTSENSORPIN);
+
+  Serial.print("Light reading: ");
+  Serial.print(reading);
+  Serial.print(" raw, ");
+
+  if (reading <= MIN_LIGHT) brightness = 0;
+  else if (reading >= MAX_LIGHT) brightness = MAX_BRIGHTNESS;
+  else {
+    // Percentage in lux range * brightness range + min brightness
+    float brightness_percent = (reading - MIN_LIGHT) / (MAX_LIGHT - MIN_LIGHT);
+    brightness = brightness_percent * (MAX_BRIGHTNESS - MIN_BRIGHTNESS) + MIN_BRIGHTNESS;
+  }
+
+  Serial.print(brightness);
+  Serial.println(" brightness");
+  FastLED.setBrightness(brightness);
+  FastLED.show();
+}
+
 void loop() {
   digitalWrite(LED_BUILTIN, LOW); // on if we're awake
+
+  adjustBrightness();
+
   int c;
-  const unsigned int lightningLoopThreshold = REQUEST_INTERVAL / LIGHTNING_INTERVAL;
+  loops++;
+  Serial.print("Loop: ");
+  Serial.println(loops);
+  unsigned int loopThreshold = 1;
+  if (DO_LIGHTNING || USE_LIGHT_SENSOR) unsigned int loopThreshold = REQUEST_INTERVAL / LOOP_INTERVAL;
 
   // Connect to WiFi. We always want a wifi connection for the ESP8266
   if (WiFi.status() != WL_CONNECTED) {
@@ -151,9 +199,6 @@ void loop() {
 
   // Do some lightning
   if (DO_LIGHTNING && lightningLeds.size() > 0) {
-    lightningLoops++;
-    Serial.print("Loop: ");
-    Serial.println(lightningLoops);
     std::vector<CRGB> lightning(lightningLeds.size());
     for (unsigned short int i = 0; i < lightningLeds.size(); ++i) {
       unsigned short int currentLed = lightningLeds[i];
@@ -168,10 +213,11 @@ void loop() {
     }
     FastLED.show();
     digitalWrite(LED_BUILTIN, HIGH);
-    delay(LIGHTNING_INTERVAL); // pause during the interval
+    delay(LOOP_INTERVAL); // pause during the interval
   }
 
-  if (lightningLeds.size() == 0 || !DO_LIGHTNING || lightningLoops >= lightningLoopThreshold) {
+  if (loops >= loopThreshold) {
+    loops = 0;
     if (DEBUG) {
       fill_gradient_RGB(leds, NUM_AIRPORTS, CRGB::Red, CRGB::Blue); // Just let us know we're running
       FastLED.show();
@@ -182,13 +228,12 @@ void loop() {
       Serial.println("Refreshing LEDs.");
       FastLED.show();
       if (DO_LIGHTNING && lightningLeds.size() > 0) {
-        lightningLoops = 0;
-        Serial.println("There is lightning, so no long sleep.");
+        Serial.println("There is lightning or we're using a light sensor, so no long sleep.");
       } else {
         Serial.print("No lightning; Going into sleep for: ");
         Serial.println(REQUEST_INTERVAL);
         digitalWrite(LED_BUILTIN, HIGH);
-        delay(REQUEST_INTERVAL); // delay 10 seconds to give it time to go
+        delay(REQUEST_INTERVAL);
       }
     } else {
       delay(RETRY_TIMEOUT); // try again if unsuccessful
