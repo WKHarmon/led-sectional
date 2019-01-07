@@ -227,7 +227,7 @@ void loop() {
     if (getMetars()) {
       Serial.println("Refreshing LEDs.");
       FastLED.show();
-      if (DO_LIGHTNING && lightningLeds.size() > 0) {
+      if ((DO_LIGHTNING && lightningLeds.size() > 0) || USE_LIGHT_SENSOR) {
         Serial.println("There is lightning or we're using a light sensor, so no long sleep.");
       } else {
         Serial.print("No lightning; Going into sleep for: ");
