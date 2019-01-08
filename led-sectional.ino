@@ -13,16 +13,16 @@ using namespace std;
 #define REQUEST_INTERVAL 900000 // How often we update. In practice LOOP_INTERVAL is added. In ms (15 min is 900000)
 
 /* This section only applies if you have an ambient light sensor connected */
-#define USE_LIGHT_SENSOR false // set to true if you want to use a light sensor
+#define USE_LIGHT_SENSOR true // set to true if you want to use a light sensor
 #define LIGHTSENSORPIN A0 // A0 is the only valid pin for an analog light sensor
 /* The sketch will automatically scale the light between MIN_BRIGHTNESS and
 MAX_BRIGHTNESS on the ambient light values between MIN_LIGHT and MAX_LIGHT
 Set MIN_BRIGHTNESS and MAX_BRIGHTNESS to the same value to achieve a simple on/off effect. */
-#define MIN_BRIGHTNESS 20 // Recommend values above 3 as colors don't show well below that
+#define MIN_BRIGHTNESS 4 // Recommend values above 4 as colors don't show well below that
 #define MAX_BRIGHTNESS 20 // Recommend values between 20 and 30
 // Light values are a raw reading and don't correlate to lux
-#define MIN_LIGHT 3 // Recommended default is 3
-#define MAX_LIGHT 100 // Recommended default is 100
+#define MIN_LIGHT 16 // Recommended default is 16 -- it's unreliable below that
+#define MAX_LIGHT 30 // Recommended default is 30 to 40
 /* ----------------------------------------------------------------------- */
 
 #define SERVER "www.aviationweather.gov"
@@ -33,7 +33,7 @@ Set MIN_BRIGHTNESS and MAX_BRIGHTNESS to the same value to achieve a simple on/o
 const char ssid[] = "EDITME";        // your network SSID (name)
 const char pass[] = "EDITME";    // your network password (use for WPA, or use as key for WEP)
 boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
-unsigned int loops;
+int loops = -1;
 
 int status = WL_IDLE_STATUS;
 
@@ -168,7 +168,7 @@ void loop() {
   Serial.print("Loop: ");
   Serial.println(loops);
   unsigned int loopThreshold = 1;
-  if (DO_LIGHTNING || USE_LIGHT_SENSOR) unsigned int loopThreshold = REQUEST_INTERVAL / LOOP_INTERVAL;
+  if (DO_LIGHTNING || USE_LIGHT_SENSOR) loopThreshold = REQUEST_INTERVAL / LOOP_INTERVAL;
 
   // Connect to WiFi. We always want a wifi connection for the ESP8266
   if (WiFi.status() != WL_CONNECTED) {
@@ -213,10 +213,9 @@ void loop() {
     }
     FastLED.show();
     digitalWrite(LED_BUILTIN, HIGH);
-    delay(LOOP_INTERVAL); // pause during the interval
   }
 
-  if (loops >= loopThreshold) {
+  if (loops >= loopThreshold || loops == 0) {
     loops = 0;
     if (DEBUG) {
       fill_gradient_RGB(leds, NUM_AIRPORTS, CRGB::Red, CRGB::Blue); // Just let us know we're running
@@ -229,6 +228,7 @@ void loop() {
       FastLED.show();
       if ((DO_LIGHTNING && lightningLeds.size() > 0) || USE_LIGHT_SENSOR) {
         Serial.println("There is lightning or we're using a light sensor, so no long sleep.");
+        delay(LOOP_INTERVAL); // pause during the interval
       } else {
         Serial.print("No lightning; Going into sleep for: ");
         Serial.println(REQUEST_INTERVAL);
@@ -238,7 +238,7 @@ void loop() {
     } else {
       delay(RETRY_TIMEOUT); // try again if unsuccessful
     }
-  }
+  } else delay(LOOP_INTERVAL); // pause during the interval
 }
 
 bool getMetars(){
