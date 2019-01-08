@@ -18,7 +18,7 @@ using namespace std;
 /* The sketch will automatically scale the light between MIN_BRIGHTNESS and
 MAX_BRIGHTNESS on the ambient light values between MIN_LIGHT and MAX_LIGHT
 Set MIN_BRIGHTNESS and MAX_BRIGHTNESS to the same value to achieve a simple on/off effect. */
-#define MIN_BRIGHTNESS 4 // Recommend values above 4 as colors don't show well below that
+#define MIN_BRIGHTNESS 20 // Recommend values above 4 as colors don't show well below that
 #define MAX_BRIGHTNESS 20 // Recommend values between 20 and 30
 // Light values are a raw reading and don't correlate to lux
 #define MIN_LIGHT 16 // Recommended default is 16 -- it's unreliable below that
@@ -125,9 +125,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // give us control of the onboard LED
   digitalWrite(LED_BUILTIN, LOW);
 
-  if (USE_LIGHT_SENSOR) {
-    pinMode(LIGHTSENSORPIN, INPUT);
-  }
+  if (USE_LIGHT_SENSOR) pinMode(LIGHTSENSORPIN, INPUT);
 
   // Initialize LEDs
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_AIRPORTS).setCorrection(TypicalLEDStrip);
