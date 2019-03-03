@@ -12,8 +12,10 @@ using namespace std;
 #define DO_WINDS true // color LEDs for high winds
 #define REQUEST_INTERVAL 900000 // How often we update. In practice LOOP_INTERVAL is added. In ms (15 min is 900000)
 
+#define USE_LIGHT_SENSOR false // set to true if you want to use a light sensor
+
+#if USE_LIGHT_SENSOR
 /* This section only applies if you have an ambient light sensor connected */
-#define USE_LIGHT_SENSOR true // set to true if you want to use a light sensor
 #define LIGHTSENSORPIN A0 // A0 is the only valid pin for an analog light sensor
 /* The sketch will automatically scale the light between MIN_BRIGHTNESS and
 MAX_BRIGHTNESS on the ambient light values between MIN_LIGHT and MAX_LIGHT
@@ -24,6 +26,7 @@ Set MIN_BRIGHTNESS and MAX_BRIGHTNESS to the same value to achieve a simple on/o
 #define MIN_LIGHT 16 // Recommended default is 16 -- it's unreliable below that
 #define MAX_LIGHT 30 // Recommended default is 30 to 40
 /* ----------------------------------------------------------------------- */
+#endif
 
 #define SERVER "www.aviationweather.gov"
 #define BASE_URI "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecentForEachStation=true&stationString="
@@ -43,7 +46,7 @@ int status = WL_IDLE_STATUS;
 
 // Define the array of leds
 CRGB leds[NUM_AIRPORTS];
-#define DATA_PIN    5
+#define DATA_PIN    5 // Kits shipped after March 1, 2019 need to switch this to 14
 #define LED_TYPE    WS2811
 #define COLOR_ORDER RGB
 #define BRIGHTNESS 20 // 20-30 recommended. If using a light sensor, this is the initial brightness on boot.
@@ -125,13 +128,16 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // give us control of the onboard LED
   digitalWrite(LED_BUILTIN, LOW);
 
-  if (USE_LIGHT_SENSOR) pinMode(LIGHTSENSORPIN, INPUT);
+  #if USE_LIGHT_SENSOR
+  pinMode(LIGHTSENSORPIN, INPUT);
+  #endif
 
   // Initialize LEDs
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_AIRPORTS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 }
 
+#if USE_LIGHT_SENSOR
 void adjustBrightness() {
   float reading;
   byte brightness;
@@ -155,11 +161,14 @@ void adjustBrightness() {
   FastLED.setBrightness(brightness);
   FastLED.show();
 }
+#endif
 
 void loop() {
   digitalWrite(LED_BUILTIN, LOW); // on if we're awake
 
-  if (USE_LIGHT_SENSOR) adjustBrightness();
+  #if USE_LIGHT_SENSOR
+  adjustBrightness();
+  #endif
 
   int c;
   loops++;
