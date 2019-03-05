@@ -6,50 +6,48 @@ using namespace std;
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
 #define NUM_AIRPORTS 62 // This is really the number of LEDs
-#define WIND_THRESHOLD 25 // Maximum windspeed for green
+#define WIND_THRESHOLD 25 // Maximum windspeed for green, otherwise the LED turns yellow
 #define LOOP_INTERVAL 5000 // ms - interval between brightness updates and lightning strikes
 #define DO_LIGHTNING true // Lightning uses more power, but is cool.
 #define DO_WINDS true // color LEDs for high winds
 #define REQUEST_INTERVAL 900000 // How often we update. In practice LOOP_INTERVAL is added. In ms (15 min is 900000)
 
-#define USE_LIGHT_SENSOR false // set to true if you want to use a light sensor
+#define USE_LIGHT_SENSOR true // Set USE_LIGHT_SENSOR to true if you're using any light sensor.
+#define LIGHT_SENSOR_TSL2561 true // Set LIGHT_SENSOR_TSL2561 to true if you're using a TSL2561 digital light sensor
 
-#if USE_LIGHT_SENSOR
+const char ssid[] = "EDITME"; // your network SSID (name)
+const char pass[] = "EDITME"; // your network password (use for WPA, or use as key for WEP)
+
+// Define the array of leds
+CRGB leds[NUM_AIRPORTS];
+#define DATA_PIN    14 // Kits shipped after March 1, 2019 need to switch this to 14
+#define LED_TYPE    WS2811
+#define COLOR_ORDER RGB
+#define BRIGHTNESS 20 // 20-30 recommended. If using a light sensor, this is the initial brightness on boot.
+
 /* This section only applies if you have an ambient light sensor connected */
-#define LIGHTSENSORPIN A0 // A0 is the only valid pin for an analog light sensor
+#if USE_LIGHT_SENSOR
 /* The sketch will automatically scale the light between MIN_BRIGHTNESS and
 MAX_BRIGHTNESS on the ambient light values between MIN_LIGHT and MAX_LIGHT
 Set MIN_BRIGHTNESS and MAX_BRIGHTNESS to the same value to achieve a simple on/off effect. */
 #define MIN_BRIGHTNESS 20 // Recommend values above 4 as colors don't show well below that
 #define MAX_BRIGHTNESS 20 // Recommend values between 20 and 30
-// Light values are a raw reading and don't correlate to lux
-#define MIN_LIGHT 16 // Recommended default is 16 -- it's unreliable below that
-#define MAX_LIGHT 30 // Recommended default is 30 to 40
-/* ----------------------------------------------------------------------- */
+
+// Light values are a raw reading for analog and lux for digital
+#define MIN_LIGHT 16 // Recommended default is 16 for analog and 2 for lux
+#define MAX_LIGHT 30 // Recommended default is 30 to 40 for analog and 20 for lux
+
+#if LIGHT_SENSOR_TSL2561
+#include <Adafruit_Sensor.h>
+#include <Adafruit_TSL2561_U.h>
+#include <Wire.h>
+Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 12345);
+#else
+#define LIGHTSENSORPIN A0 // A0 is the only valid pin for an analog light sensor
 #endif
 
-#define SERVER "www.aviationweather.gov"
-#define BASE_URI "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecentForEachStation=true&stationString="
-
-#define DEBUG false
-
-const char ssid[] = "EDITME";        // your network SSID (name)
-const char pass[] = "EDITME";    // your network password (use for WPA, or use as key for WEP)
-boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
-int loops = -1;
-
-int status = WL_IDLE_STATUS;
-
-#define READ_TIMEOUT 15 // Cancel query if no data received (seconds)
-#define WIFI_TIMEOUT 60 // in seconds
-#define RETRY_TIMEOUT 15000 // in ms
-
-// Define the array of leds
-CRGB leds[NUM_AIRPORTS];
-#define DATA_PIN    5 // Kits shipped after March 1, 2019 need to switch this to 14
-#define LED_TYPE    WS2811
-#define COLOR_ORDER RGB
-#define BRIGHTNESS 20 // 20-30 recommended. If using a light sensor, this is the initial brightness on boot.
+#endif
+/* ----------------------------------------------------------------------- */
 
 std::vector<unsigned short int> lightningLeds;
 std::vector<String> airports({
@@ -117,6 +115,20 @@ std::vector<String> airports({
   "KO88" // 62
 });
 
+#define DEBUG false
+
+#define READ_TIMEOUT 15 // Cancel query if no data received (seconds)
+#define WIFI_TIMEOUT 60 // in seconds
+#define RETRY_TIMEOUT 15000 // in ms
+
+#define SERVER "www.aviationweather.gov"
+#define BASE_URI "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecentForEachStation=true&stationString="
+
+boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
+int loops = -1;
+
+int status = WL_IDLE_STATUS;
+
 void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(74880);
@@ -129,7 +141,18 @@ void setup() {
   digitalWrite(LED_BUILTIN, LOW);
 
   #if USE_LIGHT_SENSOR
+  #if LIGHT_SENSOR_TSL2561
+  Wire.begin(D2, D1);
+  if(!tsl.begin()) {
+    /* There was a problem detecting the TSL2561 ... check your connections */
+    Serial.println("Ooops, no TSL2561 detected ... Check your wiring or I2C ADDR!");
+  } else {
+    tsl.enableAutoRange(true);
+    tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_13MS);
+  }
+  #else
   pinMode(LIGHTSENSORPIN, INPUT);
+  #endif
   #endif
 
   // Initialize LEDs
@@ -139,10 +162,16 @@ void setup() {
 
 #if USE_LIGHT_SENSOR
 void adjustBrightness() {
-  float reading;
   byte brightness;
+  float reading;
 
+  #if LIGHT_SENSOR_TSL2561
+  sensors_event_t event;
+  tsl.getEvent(&event);
+  reading = event.light;
+  #else
   reading = analogRead(LIGHTSENSORPIN);
+  #endif
 
   Serial.print("Light reading: ");
   Serial.print(reading);
