@@ -12,8 +12,10 @@ using namespace std;
 #define DO_WINDS true // color LEDs for high winds
 #define REQUEST_INTERVAL 900000 // How often we update. In practice LOOP_INTERVAL is added. In ms (15 min is 900000)
 
-#define USE_LIGHT_SENSOR true // Set USE_LIGHT_SENSOR to true if you're using any light sensor.
-#define LIGHT_SENSOR_TSL2561 true // Set LIGHT_SENSOR_TSL2561 to true if you're using a TSL2561 digital light sensor
+#define USE_LIGHT_SENSOR false // Set USE_LIGHT_SENSOR to true if you're using any light sensor.
+// Set LIGHT_SENSOR_TSL2561 to true if you're using a TSL2561 digital light sensor.
+// Kits shipped after March 1, 2019 have a digital light sensor. Setting this to false assumes an analog light sensor.
+#define LIGHT_SENSOR_TSL2561 false
 
 const char ssid[] = "EDITME"; // your network SSID (name)
 const char pass[] = "EDITME"; // your network password (use for WPA, or use as key for WEP)
