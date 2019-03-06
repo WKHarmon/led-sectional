@@ -22,7 +22,7 @@ const char pass[] = "EDITME"; // your network password (use for WPA, or use as k
 
 // Define the array of leds
 CRGB leds[NUM_AIRPORTS];
-#define DATA_PIN    14 // Kits shipped after March 1, 2019 need to switch this to 14
+#define DATA_PIN    5 // Kits shipped after March 1, 2019 need to switch this to 14. Earlier kits us 5.
 #define LED_TYPE    WS2811
 #define COLOR_ORDER RGB
 #define BRIGHTNESS 20 // 20-30 recommended. If using a light sensor, this is the initial brightness on boot.
