@@ -98,6 +98,7 @@ You'll need to install the following in order to program the board:
 * [ESP8266 Core](https://github.com/esp8266/Arduino) is necessary to use the ESP8266-compatible controller in the Arduino IDE.
 * [CH340G Driver](https://wiki.wemos.cc/downloads) is necessary for your computer to see the board
 * Within the Library Manager in the Arduino IDE, you'll also need to install the [FastLED Library](http://fastled.io/).
+    * If you're using a TSL2561 Ambient Light Sensor from the kit, you'll also need to add the Adafruit Unified Sensor and hte Adafruit TSL2561 libraries as well.
 
 Once you have all of that installed, you'll need to set the Board to `LOLIN(WEMOS) D1 mini Lite` under Tools in the Arduino IDE.
 

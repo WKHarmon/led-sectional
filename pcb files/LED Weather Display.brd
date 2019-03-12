@@ -2459,6 +2459,7 @@
 <hole x="66.04" y="3.81" drill="2.1"/>
 <hole x="66.04" y="33.02" drill="2.1"/>
 <hole x="3.81" y="33.02" drill="2.1"/>
+<text x="55.88" y="2.54" size="1.778" layer="21">Rev. 2</text>
 </plain>
 <libraries>
 <library name="SparkFun-Resistors" urn="urn:adsk.eagle:library:532">
