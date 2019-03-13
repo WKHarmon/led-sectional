@@ -290,7 +290,7 @@ bool getMetars(){
   boolean readingGusts = false;
   boolean readingWxstring = false;
 
-  unsigned short int led = 99;
+  std::vector<unsigned short int> led;
   String currentAirport = "";
   String currentCondition = "";
   String currentLine = "";
@@ -359,8 +359,11 @@ bool getMetars(){
         currentLine += c;
         if (c == '\n') currentLine = "";
         if (currentLine.endsWith("<station_id>")) { // start paying attention
-          if (led != 99) { // we assume we are recording results at each change in airport; 99 means no airport
-            doColor(currentAirport, led, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
+          if (!led.empty()) { // we assume we are recording results at each change in airport
+            for (vector<unsigned short int>::iterator it = led.begin(); it != led.end(); ++it) {
+              doColor(currentAirport, *it, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
+            }
+            led.clear();
           }
           currentAirport = ""; // Reset everything when the airport changes
           readingAirport = true;
@@ -375,7 +378,7 @@ bool getMetars(){
             readingAirport = false;
             for (unsigned short int i = 0; i < NUM_AIRPORTS; i++) {
               if (airports[i] == currentAirport) {
-                led = i;
+                led.push_back(i);
               }
             }
           }
@@ -424,7 +427,10 @@ bool getMetars(){
     }
   }
   // need to doColor this for the last airport
-  doColor(currentAirport, led, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
+  for (vector<unsigned short int>::iterator it = led.begin(); it != led.end(); ++it) {
+    doColor(currentAirport, *it, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
+  }
+  led.clear();
 
   // Do the key LEDs now if they exist
   for (int i = 0; i < (NUM_AIRPORTS); i++) {
