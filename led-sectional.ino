@@ -290,7 +290,7 @@ bool getMetars(){
   boolean readingGusts = false;
   boolean readingWxstring = false;
 
-  unsigned short int led = 99;
+  unsigned short int led = 999;
   String currentAirport = "";
   String currentCondition = "";
   String currentLine = "";
@@ -359,7 +359,7 @@ bool getMetars(){
         currentLine += c;
         if (c == '\n') currentLine = "";
         if (currentLine.endsWith("<station_id>")) { // start paying attention
-          if (led != 99) { // we assume we are recording results at each change in airport; 99 means no airport
+          if (led != 999) { // we assume we are recording results at each change in airport; 999 means no airport
             doColor(currentAirport, led, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
           }
           currentAirport = ""; // Reset everything when the airport changes
