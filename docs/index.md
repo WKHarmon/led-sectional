@@ -133,8 +133,6 @@ Once I had it all connected up, I created a small pigtail with a JST-XH connecto
 ![Enclosure](https://wkharmon.github.io/led-sectional/images/Enclosure.jpg)
 
 ## Mounting the sectionals
-You may want to consider the [drilling and glueing technique detailed here](https://pplaviationuk.wordpress.com/creating-a-metar-map/) as it may produce cleaner results, but is a bit slower.
-
 This section is only necessary if you bought actual sectionals and didn't take the shortcut and have a sectional printed and pre-mounted.
 
 When I bought the Hard Tempered Board noted above, I had Home Depot cut it to the desired size. The combined halves of the San Francisco sectional were just over 36" high, and the board itself was 24" wide, so I just decided to use that width.
