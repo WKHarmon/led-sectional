@@ -75,12 +75,17 @@ I've linked to Amazon for most of the electronic items. You should be able to bu
 **OR**
 
 * Have a [digital file](https://www.faa.gov/air_traffic/flight_info/aeronav/digital_products/vfr/) of the sectional printed and mounted on foamcore at [PictureFrames.com](http://www.pictureframes.com). If you do this, be sure to maintain the 300 ppi from the original file in order to keep the sectional to scale (assuming you want that at least).
-    * Use the [SP8 Picture Frame](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame) for plenty of depth.
+    * Use the [SP8 Picture Frame](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP8-black-wood-canvas-frame) for plenty of depth. The [SP2 Picture Frame](https://www.pictureframes.com/Custom-Frames/Canvas-Ready-Wood-Picture-Frames/SP2-black-wood-canvas-frame) also works pretty well, but the wires may rub against the wall.
 
 ## Tools
 Here are the tools you'll need. I've provided links to the ones I use, but any set of good tools will work.
-* Drill with a 7mm drill bit
 * [Glue gun](https://amzn.to/2V492Om) with plenty of [glue](https://amzn.to/2Sby6RA)
+
+If you used foamcore backing:
+* [Foamboard Hole Drill](https://amzn.to/2VIc7Du) (You'll use the smallest one in the set.)
+
+If you used wood backing:
+* Drill with a 7mm drill bit
 
 If you went the a la carte route for the electronics, you'll also need:
 * [Soldering iron](https://amzn.to/2BwFUGB) and solder
@@ -143,13 +148,15 @@ Once the glue was dried, I cut off the excess parts of the sectional using an ex
 ## Drilling
 **Important: Don't use ForeFlight to determine where METARs are available.** ForeFlight aggregates several sources of weather data together, and contains several airports that are not available via the aviationweather.gov API. I suggest using the METAR map at aviationweather.gov to determine where to drill.
 
-Once I figured out where I wanted to drill, I used a 7mm drill bit to drill through the sectional and the backing board together. This resulted in some holes that weren't super clean.
+The Foamboard Holl Drill makes super clean cuts and is the perfect size for the LEDs, so I highly recommend grabbing that set if you used foamcore backing and drilling using them.
+
+On my first board I used wood backing, which was quite a bit more challenging. I used a 7mm drill bit to drill through the sectional and the backing board together. This resulted in some holes that weren't super clean.
 
 ![Rough Edges](https://wkharmon.github.io/led-sectional/images/Rough edges.jpg)
 
-I specifically wanted my LEDs to stick out, but if you didn't then adjusting the drill bit size and using a countersink bit would allow you to align them with the front of the board.
+I specifically wanted my LEDs to stick out, but if you don't then adjusting the drill bit size and using a countersink bit would allow you to align them with the front of the board.
 
-After I drilled, I then took a file and an exacto knife to clean up the edges to make it look significantly better. There was far less of this necessary on a subsequent map where I used foamcore instead of wood.
+After I drilled, I then took a file and an exacto knife to clean up the edges to make it look significantly better.
 
 ## Glueing LEDs
 Once all of the holes were drilled, I rough fit the LEDs throught he holes in the back to try to find the optimal routing. IT's not important what order they're in yet--I'm just trying to waste the fewest LEDs. Once I figured it out, I started gluing a few at a time using the hot glue gun.
