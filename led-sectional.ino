@@ -242,6 +242,8 @@ void loop() {
       unsigned short int currentLed = lightningLeds[i];
       lightning[i] = leds[currentLed]; // temporarily store original color
       leds[currentLed] = CRGB::White; // set to white briefly
+      Serial.print("Lightning on LED: ");
+      Serial.println(currentLed);
     }
     FastLED.show();
     delay(25);
@@ -250,7 +252,6 @@ void loop() {
       leds[currentLed] = lightning[i]; // restore original color
     }
     FastLED.show();
-    digitalWrite(LED_BUILTIN, HIGH);
   }
 
   if (loops >= loopThreshold || loops == 0) {
@@ -266,6 +267,7 @@ void loop() {
       FastLED.show();
       if ((DO_LIGHTNING && lightningLeds.size() > 0) || USE_LIGHT_SENSOR) {
         Serial.println("There is lightning or we're using a light sensor, so no long sleep.");
+        digitalWrite(LED_BUILTIN, HIGH);
         delay(LOOP_INTERVAL); // pause during the interval
       } else {
         Serial.print("No lightning; Going into sleep for: ");
@@ -274,9 +276,13 @@ void loop() {
         delay(REQUEST_INTERVAL);
       }
     } else {
+      digitalWrite(LED_BUILTIN, HIGH);
       delay(RETRY_TIMEOUT); // try again if unsuccessful
     }
-  } else delay(LOOP_INTERVAL); // pause during the interval
+  } else {
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(LOOP_INTERVAL); // pause during the interval
+  }
 }
 
 bool getMetars(){
