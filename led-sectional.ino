@@ -245,6 +245,7 @@ void loop() {
       Serial.print("Lightning on LED: ");
       Serial.println(currentLed);
     }
+    delay(25); // extra delay seems necessary with light sensor
     FastLED.show();
     delay(25);
     for (unsigned short int i = 0; i < lightningLeds.size(); ++i) {
