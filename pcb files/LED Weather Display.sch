@@ -2945,17 +2945,17 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <segment>
 <pinref part="PROGRAM" gate="G$1" pin="1"/>
 <wire x1="10.16" y1="25.4" x2="-12.7" y2="25.4" width="0.1524" layer="91"/>
-<pinref part="WEMOS1" gate="D1" pin="RESET"/>
-<wire x1="-12.7" y1="25.4" x2="-12.7" y2="78.74" width="0.1524" layer="91"/>
-<wire x1="-12.7" y1="78.74" x2="0" y2="78.74" width="0.1524" layer="91"/>
+<pinref part="WEMOS1" gate="D1" pin="D6"/>
+<wire x1="0" y1="68.58" x2="-12.7" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="-12.7" y1="68.58" x2="-12.7" y2="25.4" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$8" class="0">
 <segment>
 <pinref part="RESET" gate="-2" pin="S"/>
 <wire x1="17.78" y1="50.8" x2="0" y2="50.8" width="0.1524" layer="91"/>
-<pinref part="WEMOS1" gate="D1" pin="D6"/>
-<wire x1="0" y1="50.8" x2="0" y2="68.58" width="0.1524" layer="91"/>
+<pinref part="WEMOS1" gate="D1" pin="RESET"/>
+<wire x1="0" y1="50.8" x2="0" y2="78.74" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

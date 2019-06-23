@@ -3148,19 +3148,19 @@ design rules under a new name.</description>
 </signal>
 <signal name="N$7">
 <contactref element="PROGRAM" pad="1"/>
-<contactref element="WEMOS1" pad="RESET"/>
-<wire x1="56.4388" y1="34.0106" x2="26.67" y2="34.0106" width="0.2032" layer="16"/>
-<wire x1="26.67" y1="34.0106" x2="26.67" y2="34.29" width="0.2032" layer="16"/>
-<wire x1="26.67" y1="34.29" x2="26.67" y2="27.94" width="0.2032" layer="16"/>
+<contactref element="WEMOS1" pad="D6"/>
+<wire x1="16.51" y1="34.0106" x2="16.51" y2="27.94" width="0.2032" layer="16"/>
+<wire x1="56.4388" y1="34.0106" x2="16.51" y2="34.0106" width="0.2032" layer="16"/>
 </signal>
 <signal name="N$8">
 <contactref element="RESET" pad="2"/>
-<contactref element="WEMOS1" pad="D6"/>
 <wire x1="49.53" y1="29.21" x2="49.53" y2="30.5308" width="0.2032" layer="1"/>
 <wire x1="49.53" y1="30.5308" x2="45.7962" y2="30.5308" width="0.2032" layer="1"/>
-<wire x1="45.7962" y1="30.5308" x2="45.7962" y2="31.8262" width="0.2032" layer="1"/>
-<wire x1="45.7962" y1="31.8262" x2="16.51" y2="31.8262" width="0.2032" layer="1"/>
-<wire x1="16.51" y1="31.8262" x2="16.51" y2="27.94" width="0.2032" layer="1"/>
+<wire x1="45.7962" y1="30.5308" x2="45.7962" y2="31.75" width="0.2032" layer="1"/>
+<contactref element="WEMOS1" pad="RESET"/>
+<wire x1="45.7962" y1="31.75" x2="45.7962" y2="31.8262" width="0.2032" layer="1"/>
+<wire x1="45.7962" y1="31.8262" x2="26.67" y2="31.8262" width="0.2032" layer="1"/>
+<wire x1="26.67" y1="31.8262" x2="26.67" y2="27.94" width="0.2032" layer="1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
