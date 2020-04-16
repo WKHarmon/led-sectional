@@ -5,17 +5,19 @@ using namespace std;
 
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
-#define NUM_AIRPORTS 62 // This is really the number of LEDs
+#define NUM_AIRPORTS 92 // This is really the number of LEDs
 #define WIND_THRESHOLD 25 // Maximum windspeed for green, otherwise the LED turns yellow
 #define LOOP_INTERVAL 5000 // ms - interval between brightness updates and lightning strikes
 #define DO_LIGHTNING true // Lightning uses more power, but is cool.
 #define DO_WINDS true // color LEDs for high winds
-#define REQUEST_INTERVAL 900000 // How often we update. In practice LOOP_INTERVAL is added. In ms (15 min is 900000)
+#define REQUEST_INTERVAL 300000 // How often we update. In practice LOOP_INTERVAL is added. In ms (15 min is 900000)
 
 #define USE_LIGHT_SENSOR false // Set USE_LIGHT_SENSOR to true if you're using any light sensor.
 // Set LIGHT_SENSOR_TSL2561 to true if you're using a TSL2561 digital light sensor.
 // Kits shipped after March 1, 2019 have a digital light sensor. Setting this to false assumes an analog light sensor.
 #define LIGHT_SENSOR_TSL2561 false
+
+#define USE_ROTARY_ENCODER true // set to true if you're using a rotary encoder to control brightness
 
 const char ssid[] = "EDITME"; // your network SSID (name)
 const char pass[] = "EDITME"; // your network password (use for WPA, or use as key for WEP)
@@ -51,70 +53,107 @@ Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 1234
 #endif
 /* ----------------------------------------------------------------------- */
 
+/* This section only applies if you have an rotary encoder connected */
+#if USE_ROTARY_ENCODER
+#include <Encoder.h>
+Encoder rotaryEncoder(D2, D1); // Pins D1, D2
+#endif
+/* ----------------------------------------------------------------------- */
+
 std::vector<unsigned short int> lightningLeds;
 std::vector<String> airports({
-  "KKIC", // order of LEDs, starting with 1 should be KKIC; use VFR, WVFR, MVFR, IFR, LIFR for key; NULL for no airport
-  "KMRY", // 2
-  "KSNS", // 3
-  "KCVH", // 4
-  "KE16", // 5
-  "KWVI", // 6
-  "KRHV", // 7
-  "KSJC", // 8
-  "KNUQ", // 9
-  "KPAO", // 10
-  "KSQL", // 11
-  "KHAF", // 12
-  "KSFO", // 13
-  "KOAK", // 14
-  "KHWD", // 15
-  "KLVK", // 16
-  "KC83", // 17
-  "NULL", // 18 empty
-  "KCCR", // 19
-  "KSUU", // 20
-  "KVCB", // 21
-  "KAPC", // 22
-  "KDVO", // 23
-  "KO69", // 24
-  "KSTS", // 25
-  "KHES", // 26
-  "NULL", // 27 empty
-  "KUKI", // 28
-  "KRBL", // 29
-  "NULL", // 30 empty
-  "KCIC", // 31
-  "NULL", // 32 empty
-  "KOVE", // 33
-  "NULL", // 34 empty
-  "KMYV", // 35
-  "KBAB", // 36
-  "KAUN", // 37
-  "KLHM", // 38
-  "KSMF", // 39
-  "KEDU", // 40
-  "KSAC", // 41
-  "KMCC", // 42
-  "KMHR", // 43
-  "NULL", // 44 empty
-  "KPVF", // 45
-  "NULL", // 46 empty
-  "KBLU", // 47
-  "KTRK", // 48
-  "NULL", // 49 empty
-  "KTVL", // 50
-  "KO22", // 51
-  "KCPU", // 52
-  "KJAQ", // 53
-  "NULL", // 54 empty
-  "KSCK", // 55
-  "KMOD", // 56
-  "NULL", // 57 empty
-  "KMER", // 58
-  "KMCE", // 59
-  "NULL", // 60 empty
-  "KMAE", // 61
-  "KO88" // 62
+  "KIPT", // 0 order of LEDs, starting with 1 should be KKIC; use VFR, WVFR, MVFR, IFR, LIFR for key; NULL for no airport
+  "KSEG", // 1
+  "KMUI", // 2
+  "KCXY", // 3
+  "KMDT", // 4
+  "KLNS", // 5
+  "KRDG", // 6
+  "KPTW", // 7
+  "KLOM", // 8
+  "KPNE", // 9
+  "KWRI", // 10
+  "KNEL", // 11
+  "KBLM", // 12
+  "KTTN", // 13
+  "KABE", // 14
+  "KHZL", // 15
+  "KAVP", // 16
+  "KFWN", // 17
+  "KMMU", // 18
+  "KCDW", // 19
+  "KTEB", // 20
+  "KEWR", // 21
+  "KLGA", // 22
+  "KJFK", // 23
+  "KFRG", // 24
+  "KISP", // 25
+  "KFOK", // 26
+  "KHTO", // 27
+  "KBID", // 28
+  "KGON", // 29
+  "KHVN", // 30
+  "KBDR", // 31
+  "KHPN", // 32
+  "KMSV", // 33
+  "KSWF", // 34
+  "KPOU", // 35
+  "KDXR", // 36
+  "KOXC", // 37
+  "KHFD", // 38
+  "KBDL", // 39
+  "KBAF", // 40
+  "KCEF", // 41
+  "KPVD", // 42
+  "KUUU", // 43
+  "KMVY", // 44
+  "KACK", // 45
+  "KCQX", // 46
+  "KPVC", // 47
+  "KHYA", // 48
+  "KFMH", // 49
+  "KEWB", // 50
+  "KGHG", // 51
+  "KOWD", // 52
+  "KORH", // 53
+  "KEEN", // 54
+  "KBED", // 55
+  "KBOS", // 56
+  "KBVY", // 57
+  "KLWM", // 58
+  "KASH", // 59
+  "KMHT", // 60
+  "KCON", // 61
+  "KPSM", // 62
+  "KDAW", // 63
+  "KSFM", // 64
+  "KPWM", // 65
+  "KIWI", // 66
+  "KRKD", // 67
+  "KLEW", // 68
+  "KIZG", // 69
+  "KMWN", // 70
+  "KLCI", // 71
+  "K1P1", // 72
+  "KLEB", // 73
+  "KMPV", // 74
+  "K6B0", // 75
+  "KRUT", // 76
+  "KVSF", // 77
+  "KEEN", // 78
+  "KPSF", // 79
+  "KALB", // 80
+  "KSCH", // 81
+  "KNY0", // 82
+  "KGFL", // 83
+  "KRME", // 84
+  "KGTB", // 85
+  "KART", // 86
+  "KFZY", // 87
+  "KSYR", // 88
+  "KITH", // 89
+  "KBGM", // 90
+  "KELM" // 91 last airport does NOT have a comma after
 });
 
 #define DEBUG false
@@ -157,12 +196,16 @@ void setup() {
   #endif
   #endif
 
+  #if USE_ROTARY_ENCODER
+  rotaryEncoder.write(BRIGHTNESS);
+  #endif
+
   // Initialize LEDs
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_AIRPORTS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
 }
 
-#if USE_LIGHT_SENSOR
+#if USE_LIGHT_SENSOR || USE_ROTARY_ENCODER
 void adjustBrightness() {
   byte brightness;
   float reading;
@@ -171,6 +214,15 @@ void adjustBrightness() {
   sensors_event_t event;
   tsl.getEvent(&event);
   reading = event.light;
+  #elif USE_ROTARY_ENCODER
+  reading = rotaryEncoder.read();
+  if (reading > 255) {
+    reading = 255;
+    rotaryEncoder.write(255);
+  } else if (reading < 0) {
+    reading = 0;
+    rotaryEncoder.write(0);
+  }
   #else
   reading = analogRead(LIGHTSENSORPIN);
   #endif
@@ -179,6 +231,9 @@ void adjustBrightness() {
   Serial.print(reading);
   Serial.print(" raw, ");
 
+  #if USE_ROTARY_ENCODER
+  brightness = reading;
+  #else
   if (reading <= MIN_LIGHT) brightness = 0;
   else if (reading >= MAX_LIGHT) brightness = MAX_BRIGHTNESS;
   else {
@@ -186,7 +241,7 @@ void adjustBrightness() {
     float brightness_percent = (reading - MIN_LIGHT) / (MAX_LIGHT - MIN_LIGHT);
     brightness = brightness_percent * (MAX_BRIGHTNESS - MIN_BRIGHTNESS) + MIN_BRIGHTNESS;
   }
-
+  #endif
   Serial.print(brightness);
   Serial.println(" brightness");
   FastLED.setBrightness(brightness);
@@ -197,7 +252,7 @@ void adjustBrightness() {
 void loop() {
   digitalWrite(LED_BUILTIN, LOW); // on if we're awake
 
-  #if USE_LIGHT_SENSOR
+  #if USE_LIGHT_SENSOR || USE_ROTARY_ENCODER
   adjustBrightness();
   #endif
 
@@ -266,7 +321,7 @@ void loop() {
     if (getMetars()) {
       Serial.println("Refreshing LEDs.");
       FastLED.show();
-      if ((DO_LIGHTNING && lightningLeds.size() > 0) || USE_LIGHT_SENSOR) {
+      if ((DO_LIGHTNING && lightningLeds.size() > 0) || USE_LIGHT_SENSOR || USE_ROTARY_ENCODER) {
         Serial.println("There is lightning or we're using a light sensor, so no long sleep.");
         digitalWrite(LED_BUILTIN, HIGH);
         delay(LOOP_INTERVAL); // pause during the interval
