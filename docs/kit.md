@@ -2,6 +2,7 @@
 On the [/r/flying subreddit](https://www.reddit.com/r/flying) there was a [great deal of interest](https://www.reddit.com/r/flying/comments/a4yb83/aviation_nerd_jackpot/ebiscca/) in a simple kit for the electronic components that could be used to create a [LED Sectional](index.md). Because of that, I've created a simple kit to help kickstart the process.
 
 ## Ordering
+**IMPORTANT: I'm currently out of stock** on the modules that power the kits. I have a shipment on the way from China, but it may take a while to get here. If you place an order now, I'll ship the kit when it becomes available, but it may be a few weeks.
 There are three different ordering links depending on how you'd like your kit configured.
 1. [Buyer programs](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CFKGLG5F2ETDW)
     * The kit will arrived programmed with a LED test program so you can ensure the strand is working properly. You'll need to program it for your map using the instructions located [here](index.md#software). You will need a high-quality Micro USB cable in order to program the board.
