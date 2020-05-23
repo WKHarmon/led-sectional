@@ -16,8 +16,8 @@ using namespace std;
 
 #define DEBUG false
 
-const char ssid[] = "FastTrackPGH";        // your network SSID (name)
-const char pass[] = "Wolverine06";    // your network password (use for WPA, or use as key for WEP)
+const char ssid[] = "";        // your network SSID (name)
+const char pass[] = "";    // your network password (use for WPA, or use as key for WEP)
 boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
 
 int status = WL_IDLE_STATUS;
@@ -330,7 +330,9 @@ AirportState getAirportState(SSLBuffer* client) {
     if (token == "raw_text") {
       String w;
       readNextFmt(client, "X<", &w);
-      if (w.indexOf("TS") != -1) {
+      int ts_idx = w.indexOf("TS");
+      int rmk_idx = w.indexOf("RMK") == -1;
+      if (ts_idx != -1 && (rmk_idx == -1 || ts_idx < rmk_idx)) {
         ret.lightning_ = true;
       }
     }
