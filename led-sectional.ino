@@ -1,5 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <FastLED.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>
 #include <vector>
 using namespace std;
 
@@ -16,9 +19,6 @@ using namespace std;
 // Set LIGHT_SENSOR_TSL2561 to true if you're using a TSL2561 digital light sensor.
 // Kits shipped after March 1, 2019 have a digital light sensor. Setting this to false assumes an analog light sensor.
 #define LIGHT_SENSOR_TSL2561 false
-
-const char ssid[] = "EDITME"; // your network SSID (name)
-const char pass[] = "EDITME"; // your network password (use for WPA, or use as key for WEP)
 
 // Define the array of leds
 CRGB leds[NUM_AIRPORTS];
@@ -160,6 +160,12 @@ void setup() {
   // Initialize LEDs
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_AIRPORTS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);
+  
+  // Setup WiFi Manager
+  WiFiManager wifiManager;
+  wifiManager.autoConnect("LED-Sectional");
+  //wifiManager.autoConnect("LED-Sectional", "AP-PASSWORD");
+  Serial.println("connected...yeey :)");
 }
 
 #if USE_LIGHT_SENSOR
@@ -207,33 +213,6 @@ void loop() {
   Serial.println(loops);
   unsigned int loopThreshold = 1;
   if (DO_LIGHTNING || USE_LIGHT_SENSOR) loopThreshold = REQUEST_INTERVAL / LOOP_INTERVAL;
-
-  // Connect to WiFi. We always want a wifi connection for the ESP8266
-  if (WiFi.status() != WL_CONNECTED) {
-    if (ledStatus) fill_solid(leds, NUM_AIRPORTS, CRGB::Orange); // indicate status with LEDs, but only on first run or error
-    FastLED.show();
-    WiFi.mode(WIFI_STA);
-    WiFi.hostname("LED Sectional " + WiFi.macAddress());
-    //wifi_set_sleep_type(LIGHT_SLEEP_T); // use light sleep mode for all delays
-    Serial.print("WiFi connecting..");
-    WiFi.begin(ssid, pass);
-    // Wait up to 1 minute for connection...
-    for (c = 0; (c < WIFI_TIMEOUT) && (WiFi.status() != WL_CONNECTED); c++) {
-      Serial.write('.');
-      delay(1000);
-    }
-    if (c >= WIFI_TIMEOUT) { // If it didn't connect within WIFI_TIMEOUT
-      Serial.println("Failed. Will retry...");
-      fill_solid(leds, NUM_AIRPORTS, CRGB::Orange);
-      FastLED.show();
-      ledStatus = true;
-      return;
-    }
-    Serial.println("OK!");
-    if (ledStatus) fill_solid(leds, NUM_AIRPORTS, CRGB::Purple); // indicate status with LEDs
-    FastLED.show();
-    ledStatus = false;
-  }
 
   // Do some lightning
   if (DO_LIGHTNING && lightningLeds.size() > 0) {
