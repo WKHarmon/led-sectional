@@ -5,7 +5,7 @@ using namespace std;
 
 #define FASTLED_ESP8266_RAW_PIN_ORDER
 
-#define NUM_AIRPORTS 62 // This is really the number of LEDs
+#define NUM_AIRPORTS 80 // This is really the number of LEDs
 #define WIND_THRESHOLD 25 // Maximum windspeed for green, otherwise the LED turns yellow
 #define LOOP_INTERVAL 5000 // ms - interval between brightness updates and lightning strikes
 #define DO_LIGHTNING true // Lightning uses more power, but is cool.
@@ -53,68 +53,86 @@ Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 1234
 
 std::vector<unsigned short int> lightningLeds;
 std::vector<String> airports({
-  "KKIC", // order of LEDs, starting with 1 should be KKIC; use VFR, WVFR, MVFR, IFR, LIFR for key; NULL for no airport
-  "KMRY", // 2
-  "KSNS", // 3
-  "KCVH", // 4
-  "KE16", // 5
-  "KWVI", // 6
-  "KRHV", // 7
-  "KSJC", // 8
-  "KNUQ", // 9
-  "KPAO", // 10
-  "KSQL", // 11
-  "KHAF", // 12
-  "KSFO", // 13
-  "KOAK", // 14
-  "KHWD", // 15
-  "KLVK", // 16
-  "KC83", // 17
-  "NULL", // 18 empty
-  "KCCR", // 19
-  "KSUU", // 20
-  "KVCB", // 21
-  "KAPC", // 22
-  "KDVO", // 23
-  "KO69", // 24
-  "KSTS", // 25
-  "KHES", // 26
-  "NULL", // 27 empty
-  "KUKI", // 28
-  "KRBL", // 29
-  "NULL", // 30 empty
-  "KCIC", // 31
-  "NULL", // 32 empty
-  "KOVE", // 33
-  "NULL", // 34 empty
-  "KMYV", // 35
-  "KBAB", // 36
-  "KAUN", // 37
-  "KLHM", // 38
-  "KSMF", // 39
-  "KEDU", // 40
-  "KSAC", // 41
-  "KMCC", // 42
-  "KMHR", // 43
-  "NULL", // 44 empty
-  "KPVF", // 45
-  "NULL", // 46 empty
-  "KBLU", // 47
-  "KTRK", // 48
-  "NULL", // 49 empty
-  "KTVL", // 50
-  "KO22", // 51
-  "KCPU", // 52
-  "KJAQ", // 53
-  "NULL", // 54 empty
-  "KSCK", // 55
-  "KMOD", // 56
-  "NULL", // 57 empty
-  "KMER", // 58
-  "KMCE", // 59
-  "NULL", // 60 empty
-  "KMAE", // 61
-  "KO88" // 62
+  "LIFR", // 1 order of LEDs, starting with 1 should be KKIC; use VFR, WVFR, MVFR, IFR, LIFR for key; NULL for no airport
+  "IFR", // 2
+  "MVFR", // 3
+  "WVFR", // 4
+  "VFR", // 5
+  "NULL", // 6
+  "NULL", // 7
+  "KMRY", // 8
+  "KSNS", // 9
+  "KCVH", // 10
+  "KWVI", // 11
+  "KE16", // 12
+  "KRHV", // 13
+  "KSJC", // 14
+  "KNUQ", // 15
+  "KPAO", // 16
+  "KSQL", // 17
+  "KHAF", // 18
+  "KSFO", // 19
+  "KOAK", // 20
+  "KHWD", // 21
+  "KLVK", // 22
+  "KC83", // 23
+  "NULL", // 24
+  "KCCR", // 25
+  "NULL", // 26
+  "KDVO", // 27
+  "KO69", // 28
+  "KSTS", // 29
+  "NULL", // 30
+  "KAPC", // 31
+  "KSUU", // 32
+  "KVCB", // 33
+  "KEDU", // 34
+  "KWMF", // 35
+  "KSAC", // 36
+  "KMHR", // 37
+  "KMCC", // 38
+  "KLHM", // 39
+  "KMYV", // 40
+  "KBAB", // 41
+  "NULL", // 42
+  "KOVE", // 43
+  "NULL", // 44
+  "KCIC", // 45
+  "NULL", // 46
+  "KRBL", // 47
+  "NULL", // 48
+  "NULL", // 49
+  "NULL", // 50
+  "KGOO", // 51
+  "KBLU", // 52
+  "NULL", // 53
+  "KTRK", // 54
+  "KRNO", // 55
+  "KCXP", // 56
+  "KMEV", // 57
+  "KTVL", // 58
+  "NULL", // 59
+  "NULL", // 60
+  "KAUN", // 61
+  "KPVF", // 62
+  "KJAQ", // 63
+  "KCPU", // 64
+  "KO22", // 65
+  "NULL", // 66
+  "NULL", // 67
+  "KSCK", // 68
+  "KTCY", // 69
+  "NULL", // 70
+  "KMOD", // 71
+  "NULL", // 72
+  "KMER", // 73
+  "MKCE", // 74
+  "NULL", // 75
+  "KMAE", // 76
+  "NULL", // 77
+  "KFAT", // 78
+  "NULL", // 79
+  "KNLC" // 80
 });
 
 #define DEBUG false
