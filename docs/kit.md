@@ -27,8 +27,8 @@ The kit includes the following:
 * JST-XH to JST-SM cable for connecting LEDs.
 
 Here's are some pictures of what you get:
-![Kit board](https://wkharmon.github.io/led-sectional/images/Kit board.jpg)
-![Kit covered](https://wkharmon.github.io/led-sectional/images/Kit covered.jpg)
+![Kit board](https://wkharmon.github.io/led-sectional/images/Kit%20board.jpg)
+![Kit covered](https://wkharmon.github.io/led-sectional/images/Kit%20covered.jpg)
 
 For the electronics, you'll need to purchase the following items as well:
 * [WS2811 LED Strands](https://amzn.to/2Sng8vF) (choose the 5V version)
