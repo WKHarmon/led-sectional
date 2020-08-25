@@ -13,14 +13,16 @@ There are three different ordering links depending on how you'd like your kit co
 
 ## About the Kit
 The kit includes the following:
-* Wemos D1 Mini micro-controller
-* Custom PCB with the following additional components included for connectivity and to comply with [Adafruit's Best Practices](https://learn.adafruit.com/adafruit-neopixel-uberguide/best-practices):
-    * [330 Ohm Resistor](https://www.digikey.com/product-detail/en/yageo/CFR-25JB-52-330R/330QBK-ND/1636)
-    * [1000 µF Capacitor](https://www.digikey.com/product-detail/en/nichicon/RL80J102MDN1KX/493-4024-1-ND/2347912)
-    * [3-pin JST XH Connector](https://www.digikey.com/product-detail/en/jst-sales-america-inc/B3B-XH-A-LF-SN/455-2248-ND/1651046)
-    * [4-pin JST XH Connector](https://www.digikey.com/product-detail/en/jst-sales-america-inc/B4B-XH-A-LF-SN/455-2249-ND/1651047)
-    * [74HCT245N Level Shifter](https://www.digikey.com/product-detail/en/texas-instruments/SN74HCT245N/296-1612-5-ND/277258)
-    * [2.1mm x 5.5mm DC Barrel Jack](https://www.digikey.com/product-detail/en/cui-inc/PJ-037A/CP-037A-ND/1644545)
+* A custom PCB that includes the following:
+    * An ESP8285 microcontroller and components and interfaces that replicate a [WEMOS D1 Mini Lite](https://docs.wemos.cc/en/latest/d1/d1_mini_lite.html) development board.
+    * The following additional components included for connectivity and to comply with [Adafruit's Best Practices](https://learn.adafruit.com/adafruit-neopixel-uberguide/best-practices):
+        * [330 Ohm Resistor](https://lcsc.com/product-detail/Chip-Resistor-Surface-Mount_UNI-ROYAL-Uniroyal-Elec-0603WAF3300T5E_C23138.html)
+        * [1000 µF Capacitor](https://lcsc.com/product-detail/Aluminum-Electrolytic-Capacitors-SMD_Lelon-VEJ102M1ATR-1010_C134756.html)
+        * [3-pin JST XH Connector](https://lcsc.com/product-detail/Wire-To-Board-Wire-To-Wire-Connector_BOOMELE-Boom-Precision-Elec-XH-3A_C2316.html) to connect LEDs
+        * [5-pin JST XH Connector](https://lcsc.com/product-detail/Wire-To-Board-Wire-To-Wire-Connector_BOOMELE-Boom-Precision-Elec-XH-5A_C2318.html) (if shipped with a light sensor) connected to the i2c bus for a TSL2561 light sensor
+        * 2x [TS-1187A-B-A-B tacticle switches](https://lcsc.com/product-detail/Tactile-Switches_XKB-Connectivity-TS-1187A-B-A-B_C318884.html), one connected to the reset switch and one ("PROGRAM") connected to GPIO12 (currently unused in the sketch)
+        * [ME6211C33M5G-N LDO](https://lcsc.com/product-detail/Dropout-Regulators-LDO_MICRONE-Nanjing-Micro-One-Elec-ME6211C33M5G-N_C82942.html) to shift 3.3v logic to 5v logic for LEDs
+        * [2.1mm x 5.5mm DC Barrel Jack](https://www.digikey.com/product-detail/en/cui-inc/PJ-037A/CP-037A-ND/1644545)
 * Custom 3D printed case
 * JST-XH to JST-SM cable for connecting LEDs.
 
@@ -40,7 +42,7 @@ Details on how to upload firmware and use the kit can be found [here](index.md#s
 ## Limitations
 There are a couple of limitations to note:
 * This is still a DIY project. I’m trying to make it pretty polished, but it’ll be a little rough around the edges. The color of the case and the board may change.
-* The Wemos modules only support 2.4 GHz WiFi, and you should ensure that you have a solid signal wherever you plan to put the map.
+* The kit only supports 2.4 GHz WiFi, and you should ensure that you have a solid signal wherever you plan to put the map.
 * I’ve tested this to about 100 LEDs. It shouldn’t have much trouble handling any single sectional, but if you plan to use a much larger area let me know so I can test it ahead of time.
 
 ## Open Source
