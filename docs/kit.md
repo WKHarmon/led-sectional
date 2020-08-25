@@ -21,7 +21,7 @@ The kit includes the following:
         * [3-pin JST XH Connector](https://lcsc.com/product-detail/Wire-To-Board-Wire-To-Wire-Connector_BOOMELE-Boom-Precision-Elec-XH-3A_C2316.html) to connect LEDs
         * [5-pin JST XH Connector](https://lcsc.com/product-detail/Wire-To-Board-Wire-To-Wire-Connector_BOOMELE-Boom-Precision-Elec-XH-5A_C2318.html) (if shipped with a light sensor) connected to the i2c bus for a TSL2561 light sensor
         * 2x [TS-1187A-B-A-B tacticle switches](https://lcsc.com/product-detail/Tactile-Switches_XKB-Connectivity-TS-1187A-B-A-B_C318884.html), one connected to the reset switch and one ("PROGRAM") connected to GPIO12 (currently unused in the sketch)
-        * [ME6211C33M5G-N LDO](https://lcsc.com/product-detail/Dropout-Regulators-LDO_MICRONE-Nanjing-Micro-One-Elec-ME6211C33M5G-N_C82942.html) to shift 3.3v logic to 5v logic for LEDs
+        * [M74VHC1GT126DF1G logic level shifter](https://lcsc.com/product-detail/Logic-Buffers-Drivers-Receivers-Transceivers_ON-Semiconductor-ON-M74VHC1GT126DF1G_C150237.html) to shift 3.3v logic to 5v logic for LEDs
         * [2.1mm x 5.5mm DC Barrel Jack](https://www.digikey.com/product-detail/en/cui-inc/PJ-037A/CP-037A-ND/1644545)
 * Custom 3D printed case
 * JST-XH to JST-SM cable for connecting LEDs.
