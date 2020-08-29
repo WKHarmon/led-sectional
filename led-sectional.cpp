@@ -130,7 +130,6 @@ Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 1234
 // You usually shouldn't need to edit anything below this.
 
 #define FASTLED_ESP8266_RAW_PIN_ORDER
-boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
 int status = WL_IDLE_STATUS;
 #define READ_TIMEOUT 15 // Cancel query if no data received (seconds)
 #define WIFI_TIMEOUT 60 // in seconds
@@ -453,6 +452,11 @@ bool getMetars() {
   return true;
 }
 
+void configModeCallback (WiFiManager *myWiFiManager) {
+  fill_solid(leds, airports.size(), CRGB::Red); // Red means we're in config mode
+  FastLED.show();
+}
+
 void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(74880);
@@ -479,9 +483,16 @@ void setup() {
     }
   }
 
+  fill_solid(leds, airports.size(), CRGB::Orange); // indicate status with LEDs
+  FastLED.show();
+
   WiFiManager wifiManager;
+  wifiManager.setAPCallback(configModeCallback);
   wifiManager.setConfigPortalTimeout(180);
   wifiManager.autoConnect(CONFIG_SSID, CONFIG_PASS);
+
+  fill_solid(leds, airports.size(), CRGB::Purple); // indicate status with LEDs
+  FastLED.show();
 }
 
 unsigned long last_update = 0;
