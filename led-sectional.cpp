@@ -496,8 +496,6 @@ void setup() {
 
 unsigned long last_update = 0;
 void loop() {
-  int c;
-
   #if USE_LIGHT_SENSOR
   adjustBrightness();
   #endif
