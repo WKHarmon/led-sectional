@@ -1,4 +1,3 @@
-#include <FS.h>
 #include <ESP8266WiFi.h>
 #include <FastLED.h>
 #include <WiFiManager.h>
