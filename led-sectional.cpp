@@ -54,7 +54,7 @@ std::vector<String> airports({
   "KSUU", // 32
   "KVCB", // 33
   "KEDU", // 34
-  "KWMF", // 35
+  "KSMF", // 35
   "KSAC", // 36
   "KMHR", // 37
   "KMCC", // 38
