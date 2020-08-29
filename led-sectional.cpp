@@ -1,5 +1,9 @@
+#include <FS.h>
 #include <ESP8266WiFi.h>
 #include <FastLED.h>
+#include <WiFiManager.h>
+#include <ESP8266WebServer.h>
+#include <DNSServer.h>
 #include <vector>
 #include <map>
 using namespace std;
@@ -13,9 +17,6 @@ using namespace std;
 // Set LIGHT_SENSOR_TSL2561 to true if you're using a TSL2561 digital light sensor.
 // Kits shipped after March 1, 2019 have a digital light sensor. Setting this to false assumes an analog light sensor.
 #define LIGHT_SENSOR_TSL2561 true
-
-const char ssid[] = "EDITME";        // your network SSID (name)
-const char pass[] = "EDITME";    // your network password (use for WPA, or use as key for WEP)
 
 #define REQUEST_INTERVAL 900000 // how often to update in ms (15 min is 900000)
 
@@ -137,6 +138,9 @@ int status = WL_IDLE_STATUS;
 #define SERVER "www.aviationweather.gov"
 #define BASE_URI "/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecentForEachStation=false&stationString="
 #define DEBUG false
+#define PROGRAM_PIN 12
+#define CONFIG_SSID "LED-Sectional"
+#define CONFIG_PASS "metar123"
 
 // Define the array of leds
 CRGB* leds;
@@ -453,6 +457,7 @@ void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(74880);
 
+  pinMode(PROGRAM_PIN, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT); // give us control of the onboard LED
   digitalWrite(LED_BUILTIN, LOW);
 
@@ -473,6 +478,10 @@ void setup() {
       }
     }
   }
+
+  WiFiManager wifiManager;
+  wifiManager.setConfigPortalTimeout(180);
+  wifiManager.autoConnect(CONFIG_SSID, CONFIG_PASS);
 }
 
 unsigned long last_update = 0;
@@ -483,31 +492,10 @@ void loop() {
   adjustBrightness();
   #endif
 
-  // Connect to WiFi. We always want a wifi connection for the ESP8266
-  if (WiFi.status() != WL_CONNECTED) {
-    if (ledStatus) fill_solid(leds, airports.size(), CRGB::Orange); // indicate status with LEDs, but only on first run or error
-    FastLED.show();
-    WiFi.mode(WIFI_STA);
-    WiFi.hostname("LED Sectional " + WiFi.macAddress());
-    //wifi_set_sleep_type(LIGHT_SLEEP_T); // use light sleep mode for all delays
-    Serial.print("WiFi connecting..");
-    WiFi.begin(ssid, pass);
-    // Wait up to 1 minute for connection...
-    for (c = 0; (c < WIFI_TIMEOUT) && (WiFi.status() != WL_CONNECTED); c++) {
-      Serial.write('.');
-      delay(1000);
-    }
-    if (c >= WIFI_TIMEOUT) { // If it didn't connect within WIFI_TIMEOUT
-      Serial.println("Failed. Will retry...");
-      fill_solid(leds, airports.size(), CRGB::Orange);
-      FastLED.show();
-      ledStatus = true;
-      return;
-    }
-    Serial.println("OK!");
-    if (ledStatus) fill_solid(leds, airports.size(), CRGB::Purple); // indicate status with LEDs
-    FastLED.show();
-    ledStatus = false;
+  if ( digitalRead(PROGRAM_PIN) == LOW ) {
+    WiFiManager wifiManager;
+    wifiManager.resetSettings();
+    ESP.restart();
   }
 
   if (last_update == 0 || (millis() > (last_update + REQUEST_INTERVAL))) {
