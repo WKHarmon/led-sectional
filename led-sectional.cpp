@@ -11,7 +11,7 @@ using namespace std;
 #define LIGHTNING_INTERVAL 5000 // ms - how often should lightning strike; not precise because we sleep in-between
 #define DO_LIGHTNING true // Do lightning flashes when there is nearby thunderstorms
 #define DO_WINDS true // color LEDs for high winds
-#define BRIGHTNESS 30 // LED brightness
+#define BRIGHTNESS 20 // LED brightness
 #define USE_LIGHT_SENSOR false // Set USE_LIGHT_SENSOR to true if you're using any light sensor.
 // Set LIGHT_SENSOR_TSL2561 to true if you're using a TSL2561 digital light sensor.
 // Kits shipped after March 1, 2019 have a digital light sensor. Setting this to false assumes an analog light sensor.
