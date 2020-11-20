@@ -349,6 +349,7 @@ bool getMetars(){
     Serial.println(" HTTP/1.1");
     Serial.print("Host: ");
     Serial.println(SERVER);
+    Serial.println("User-Agent: LED Map Client");
     Serial.println("Connection: close");
     Serial.println();
     // Make a HTTP request, and print it to console:
@@ -358,6 +359,7 @@ bool getMetars(){
     client.println(" HTTP/1.1");
     client.print("Host: ");
     client.println(SERVER);
+    client.println("User-Agent: LED Sectional Client");
     client.println("Connection: close");
     client.println();
     client.flush();
