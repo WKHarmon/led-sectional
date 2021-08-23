@@ -101,7 +101,7 @@ On power on, all LEDs will show orange initially. Once the controller is connect
 
 You'll need to install the following in order to program the board:
 * [ESP8266 Core](https://github.com/esp8266/Arduino) is necessary to use the ESP8266-compatible controller in the Arduino IDE.
-* [CH340G Driver](https://wiki.wemos.cc/downloads) is necessary for your computer to see the board
+* [CH340G Driver](https://www.wemos.cc/en/latest/tutorials/d1/get_started_with_arduino_d1.html) is necessary for your computer to see the board
 * Within the Library Manager in the Arduino IDE, you'll also need to install the [FastLED Library](http://fastled.io/).
     * If you're using a TSL2561 Ambient Light Sensor from the kit, you'll also need to add the Adafruit Unified Sensor and hte Adafruit TSL2561 libraries as well.
 
