@@ -182,7 +182,7 @@ void setup() {
 
 #if USE_LIGHT_SENSOR
 void adjustBrightness() {
-  byte brightness;
+  unsigned char brightness;
   float reading;
 
   #if LIGHT_SENSOR_TSL2561
