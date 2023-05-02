@@ -314,6 +314,7 @@ bool getMetars(){
   boolean readingWind = false;
   boolean readingGusts = false;
   boolean readingWxstring = false;
+  boolean readingRawtext = false;
 
   std::vector<unsigned short int> led;
   String currentAirport = "";
@@ -322,6 +323,7 @@ bool getMetars(){
   String currentWind = "";
   String currentGusts = "";
   String currentWxstring = "";
+  String currentRawtext = "";
   String airportString = "";
   bool firstAirport = true;
   for (int i = 0; i < NUM_AIRPORTS; i++) {
@@ -388,7 +390,7 @@ bool getMetars(){
         if (currentLine.endsWith("<station_id>")) { // start paying attention
           if (!led.empty()) { // we assume we are recording results at each change in airport
             for (vector<unsigned short int>::iterator it = led.begin(); it != led.end(); ++it) {
-              doColor(currentAirport, *it, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
+              doColor(currentAirport, *it, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring, currentRawtext);
             }
             led.clear();
           }
@@ -441,6 +443,14 @@ bool getMetars(){
           } else {
             readingWxstring = false;
           }
+        } else if (currentLine.endsWith("<raw_text>")) {
+          readingRawtext = true;
+        } else if (readingRawtext) {
+          if (!currentLine.endsWith("<")) {
+            currentRawtext += c;
+          } else {
+            readingRawtext = false;
+          }
         }
         t = millis(); // Reset timeout clock
       } else if ((millis() - t) >= (READ_TIMEOUT * 1000)) {
@@ -455,7 +465,7 @@ bool getMetars(){
   }
   // need to doColor this for the last airport
   for (vector<unsigned short int>::iterator it = led.begin(); it != led.end(); ++it) {
-    doColor(currentAirport, *it, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
+    doColor(currentAirport, *it, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring, currentRawtext);
   }
   led.clear();
 
@@ -473,7 +483,7 @@ bool getMetars(){
   return true;
 }
 
-void doColor(String identifier, unsigned short int led, int wind, int gusts, String condition, String wxstring) {
+void doColor(String identifier, unsigned short int led, int wind, int gusts, String condition, String wxstring, String rawtext) {
   CRGB color;
   Serial.print(identifier);
   Serial.print(": ");
@@ -486,7 +496,7 @@ void doColor(String identifier, unsigned short int led, int wind, int gusts, Str
   Serial.print(led);
   Serial.print(" WX: ");
   Serial.println(wxstring);
-  if (wxstring.indexOf("TS") != -1) {
+  if (wxstring.indexOf("TS") != -1 || rawtext.indexOf("LTG") != -1) {
     Serial.println("... found lightning!");
     lightningLeds.push_back(led);
   }
