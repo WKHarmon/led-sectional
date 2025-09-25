@@ -142,7 +142,7 @@ std::vector<String> airports({
 #define RETRY_TIMEOUT 15000 // in ms
 
 #define SERVER "aviationweather.gov"
-#define BASE_URI "/api/data/dataserver?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecentForEachStation=true&stationString="
+#define BASE_URI "/api/data/metar?format=xml&ids="
 
 boolean ledStatus = true; // used so leds only indicate connection status on first boot, or after failure
 int loops = -1;
@@ -384,8 +384,7 @@ bool getMetars(){
       if ((c = client.read()) >= 0) {
         yield(); // Otherwise the WiFi stack can crash
         currentLine += c;
-        if (c == '\n') currentLine = "";
-        if (currentLine.endsWith("<station_id>")) { // start paying attention
+        if (currentLine.endsWith("<METAR>")) { // got to new airport entry, start paying attention
           if (!led.empty()) { // we assume we are recording results at each change in airport
             for (vector<unsigned short int>::iterator it = led.begin(); it != led.end(); ++it) {
               doColor(currentAirport, *it, currentWind.toInt(), currentGusts.toInt(), currentCondition, currentWxstring);
@@ -398,6 +397,7 @@ bool getMetars(){
           currentWind = "";
           currentGusts = "";
           currentWxstring = "";
+          currentLine = "";   // Need to reset currentLine after reading each airport as the D1 Mini does not have enough memory to keep storing entire XML as string
         } else if (readingAirport) {
           if (!currentLine.endsWith("<")) {
             currentAirport += c;
