@@ -368,18 +368,6 @@ bool getMetars(){
 
     Serial.print("Getting data");
 
-    while (!client.connected()) {
-      if ((millis() - t) >= (READ_TIMEOUT * 1000)) {
-        Serial.println("---Timeout---");
-        client.stop();
-        return false;
-      }
-      Serial.print(".");
-      delay(1000);
-    }
-
-    Serial.println();
-
     while (client.connected()) {
       if ((c = client.read()) >= 0) {
         yield(); // Otherwise the WiFi stack can crash
@@ -392,12 +380,21 @@ bool getMetars(){
             led.clear();
           }
           currentAirport = ""; // Reset everything when the airport changes
-          readingAirport = true;
           currentCondition = "";
           currentWind = "";
           currentGusts = "";
           currentWxstring = "";
           currentLine = "";   // Need to reset currentLine after reading each airport as the D1 Mini does not have enough memory to keep storing entire XML as string
+        } else if (currentLine.endsWith("<wx_string>")) {
+          readingWxstring = true;
+        } else if (readingWxstring) {
+          if (!currentLine.endsWith("<")) {
+            currentWxstring += c;
+          } else {
+            readingWxstring = false;
+          }  
+        } else if (currentLine.endsWith("<station_id>")) {
+          readingAirport = true;   
         } else if (readingAirport) {
           if (!currentLine.endsWith("<")) {
             currentAirport += c;
@@ -433,15 +430,7 @@ bool getMetars(){
           } else {
             readingCondition = false;
           }
-        } else if (currentLine.endsWith("<wx_string>")) {
-          readingWxstring = true;
-        } else if (readingWxstring) {
-          if (!currentLine.endsWith("<")) {
-            currentWxstring += c;
-          } else {
-            readingWxstring = false;
-          }
-        }
+        } 
         t = millis(); // Reset timeout clock
       } else if ((millis() - t) >= (READ_TIMEOUT * 1000)) {
         Serial.println("---Timeout---");
