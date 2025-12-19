@@ -27,8 +27,8 @@ The kit includes the following:
 * JST-XH to JST-SM cable for connecting LEDs.
 
 Here's are some pictures of what you get:
-![Kit board](https://wkharmon.github.io/led-sectional/images/Kit%20board.jpg)
-![Kit covered](https://wkharmon.github.io/led-sectional/images/Kit%20covered.jpg)
+![Kit board](images/Kit%20board.jpg)
+![Kit covered](images/Kit%20covered.jpg)
 
 For the electronics, you'll need to purchase the following items as well:
 * [WS2811 LED Strands](https://amzn.to/2Sng8vF) (choose the 5V version)
@@ -37,7 +37,10 @@ For the electronics, you'll need to purchase the following items as well:
 You'll also need to purchase sectionals, backing, glue, etc. to create and mount the map itself. The details about how I did that are documented [here](index.md).
 
 ## Using the Kit
-Details on how to upload firmware and use the kit can be found [here](index.md#software).
+
+The easiest way to set up your kit is using the **[LED Sectional Configuration Tool](configure/)**. This browser-based tool allows you to flash firmware, configure WiFi, and set up your airport list - all without installing any software.
+
+For more details, see the [full software instructions](index.md#software).
 
 ## Limitations
 There are a couple of limitations to note:
@@ -46,4 +49,4 @@ There are a couple of limitations to note:
 * I’ve tested this to about 100 LEDs. It shouldn’t have much trouble handling any single sectional, but if you plan to use a much larger area let me know so I can test it ahead of time.
 
 ## Open Source
-Everything about the kit is open source. The code lives [here](https://github.com/WKHarmon/led-sectional/blob/master/led-sectional.ino). If you'd like to make your own PCB, the Eagle files are [here](https://github.com/WKHarmon/led-sectional/tree/master/pcb%20files), and if you have a 3D Printer the STL files for the enclosure are [here](https://github.com/WKHarmon/led-sectional/tree/master/enclosure%20stl%20files).
+Everything about the kit is open source. The firmware and web configuration tool source code is available on [GitHub](https://github.com/WKHarmon/led-sectional). If you'd like to make your own PCB, the Eagle files are in the [pcb files](https://github.com/WKHarmon/led-sectional/tree/master/pcb%20files) folder, and if you have a 3D Printer the STL files for the enclosure are in the [enclosure stl files](https://github.com/WKHarmon/led-sectional/tree/master/enclosure%20stl%20files) folder.

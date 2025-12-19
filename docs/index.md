@@ -26,9 +26,9 @@ There were small gaps in the how-to details for some of them so I figured it mig
 
 # Pictures
 Here are a few pictures of the final product:
-![Final Product](https://wkharmon.github.io/led-sectional/images/Final 1.jpg)
-![Final Product](https://wkharmon.github.io/led-sectional/images/Final 2.jpg)
-![Final Product](https://wkharmon.github.io/led-sectional/images/Final 3.jpg)
+![Final Product](images/Final%201.jpg)
+![Final Product](images/Final%202.jpg)
+![Final Product](images/Final%203.jpg)
 
 
 # Things you'll need
@@ -93,22 +93,27 @@ If you went the a la carte route for the electronics, you'll also need:
 * Optional: [Crimper for JST connectors](https://amzn.to/2S5a1fi)
 
 # Software
-The code I used for this project is available at [https://github.com/WKHarmon/led-sectional](https://github.com/WKHarmon/led-sectional). It is designed to use the Arduino IDE and should be relatively easy to adapt for your own purposes. I should mention that I'm not an engineer--I just hack together code to try to make it work, so I'm sure the code is ugly.
 
-The program uses standard definitions for VFR, MVFR, IFR, and LIFR, but I also set it to show yellow if an airport is VFR but winds are greater than 25 knots, and an airport will strobe white every 5 seconds if there are thunderstorms in the area. These can be disabled by setting `DO_WINDS` and `DO_LIGHTNING` to false respectively.
+## Web-Based Configuration (Recommended)
 
-On power on, all LEDs will show orange initially. Once the controller is connected to the WiFi network, they'll turn purple, and then they'll show the airport colors once the data is downloaded in parsed. LEDs for airports that have not reported weather in the last 3 hours, or that don't have a clear flight category will be turned off. Weather is updated every 15 minutes, and the update rate can be adjusted in `REQUEST_INTERVAL`.
+The easiest way to set up your LED Sectional is using the **[LED Sectional Configuration Tool](configure/)**. This browser-based tool allows you to:
 
-You'll need to install the following in order to program the board:
-* [ESP8266 Core](https://github.com/esp8266/Arduino) is necessary to use the ESP8266-compatible controller in the Arduino IDE.
-    * **IMPORTANT** When you install the ESP8266 Core, choose version 2.7.4 or earlier. Versions 3.0.0 forward make changes that are currently incompatible with the FastLED we use (and usually will cause the first LED in the strand to get stuck).
-* [CH340G Driver](https://www.wemos.cc/en/latest/tutorials/d1/get_started_with_arduino_d1.html) is necessary for your computer to see the board
-* Within the Library Manager in the Arduino IDE, you'll also need to install the [FastLED Library](http://fastled.io/).
-    * If you're using a TSL2561 Ambient Light Sensor from the kit, you'll also need to add the Adafruit Unified Sensor and hte Adafruit TSL2561 libraries as well.
+* **Flash firmware** directly from your browser - no software installation required
+* **Configure WiFi** by entering your network credentials
+* **Set up your airport list** with a drag-and-drop interface
+* **Adjust settings** like brightness, wind thresholds, and lightning effects
 
-Once you have all of that installed, you'll need to set the Board to `LOLIN(WEMOS) D1 mini Lite` under Tools in the Arduino IDE.
+Just connect your controller via USB, open the tool in Chrome, Edge, or Opera, and follow the on-screen instructions.
 
-The `airports` vector contains all of the airports used for the project in the order in which they appear in the LED strand. `NULL` is used when we have unused LEDs in the strand. If you'd like to add a key, you can mark those LEDs as `VFR`, `WVFR`, `MVFR`, `IFR`, and `LIFR`. You'll also need to edit in the SSID and Password for your WiFi network.
+## How It Works
+
+The program uses standard definitions for VFR, MVFR, IFR, and LIFR, but also shows yellow if an airport is VFR with winds greater than 25 knots, and airports will flash white if there are thunderstorms in the area.
+
+On power on, all LEDs will show orange initially. Once the controller is connected to the WiFi network, they'll turn purple, and then they'll show the airport colors once the data is downloaded and parsed. LEDs for airports that have not reported weather in the last 3 hours, or that don't have a clear flight category will be turned off. Weather is updated every 5 minutes.
+
+## Manual Setup (Advanced)
+
+If you prefer to program the board manually, the source code is available at [https://github.com/WKHarmon/led-sectional](https://github.com/WKHarmon/led-sectional). See the [CONTRIBUTING.md](https://github.com/WKHarmon/led-sectional/blob/master/CONTRIBUTING.md) file for development instructions.
 
 
 # Assembly
@@ -117,11 +122,11 @@ The following section is only necessary if you went the a la carte route.
 
 The Wemos D1 Mini Lite can accept 5V as input voltage, but the GPIO pins run at 3.3v. The WS2811 LED strand is expecting 5V on the data line, so it is necessary to convert the GPIO 3.3v to the WS2811 5V using a logic level shifter. (In some cases it may work without the shifter, but using one is the safer bet.) Below is a breadboard diagram for wiring it all up:
 
-![Breadboard Diagram](https://wkharmon.github.io/led-sectional/images/Wemos PCB 1_bb.png)
+![Breadboard Diagram](images/Wemos%20PCB%201_bb.png)
 
 I've diagramed on a breadboard for simplicity, but I used a 3cm x 7cm PCB. In the diagram, the (optional) JST-XH connector on the right goes to the WS2811 LED strand. If you don't want to bother with the connector, you can just solder the wires from the LED strand to the PCB.
 
-![Controller on PCB](https://wkharmon.github.io/led-sectional/images/Microcontroller on PCB.jpg)
+![Controller on PCB](images/Microcontroller%20on%20PCB.jpg)
 
  If you have a smaller number of LEDs on your map, it may be possible to power the LED strand from the Micro USB port on the Wemos D1 Mini rather than connecting an external power supply. No wiring changes are necessary, but be sure to not connect an external power supply when the Micro USB port is connected. Also be aware that the Wemos D1 Mini has a 0.5A fuse on the 5V line so it would need to be a really small number of LEDs.	
 
@@ -131,7 +136,7 @@ The WS2811 LED strand has pigtails for injecting power on the ends of the strand
 
 Once I had it all connected up, I created a small pigtail with a JST-XH connector on one side and a JST-SM connector on the other side (which matches the connectors that came with the LED strand) to make it easy to attach and detach the LED strand, then I put it in an enclosure box.
 
-![Enclosure](https://wkharmon.github.io/led-sectional/images/Enclosure.jpg)
+![Enclosure](images/Enclosure.jpg)
 
 ## Mounting the sectionals
 This section is only necessary if you bought actual sectionals and didn't take the shortcut and have a sectional printed and pre-mounted.
@@ -151,7 +156,7 @@ The Foamboard Holl Drill makes super clean cuts and is the perfect size for the 
 
 On my first board I used wood backing, which was quite a bit more challenging. I used a 7mm drill bit to drill through the sectional and the backing board together. This resulted in some holes that weren't super clean.
 
-![Rough Edges](https://wkharmon.github.io/led-sectional/images/Rough edges.jpg)
+![Rough Edges](images/Rough%20edges.jpg)
 
 I specifically wanted my LEDs to stick out, but if you don't then adjusting the drill bit size and using a countersink bit would allow you to align them with the front of the board.
 
@@ -160,11 +165,11 @@ After I drilled, I then took a file and an exacto knife to clean up the edges to
 ## Glueing LEDs
 Once all of the holes were drilled, I rough fit the LEDs throught he holes in the back to try to find the optimal routing. IT's not important what order they're in yet--I'm just trying to waste the fewest LEDs. Once I figured it out, I started gluing a few at a time using the hot glue gun.
 
-![First Glued LEDs](https://wkharmon.github.io/led-sectional/images/First glued leds.jpg)
+![First Glued LEDs](images/First%20glued%20leds.jpg)
 
 In the picture you can see that I cut the strand because the next LED in the strand was too far from the previous one, but eventually I realized that LEDs are cheap, so it is much easier to just leave the LEDs on the strand and not use them than to cut the strand and splice in a jumper. The final product looked like this:
 
-![Final Back](https://wkharmon.github.io/led-sectional/images/Final back.jpg)
+![Final Back](images/Final%20back.jpg)
 
 
 # Final Details

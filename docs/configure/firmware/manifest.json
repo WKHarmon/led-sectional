@@ -1,0 +1,17 @@
+{
+  "name": "LED Sectional",
+  "version": "2.0.0",
+  "home_assistant_domain": "esphome",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP8266",
+      "parts": [
+        {
+          "path": "led-sectional.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
