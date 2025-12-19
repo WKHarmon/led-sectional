@@ -23,10 +23,12 @@ led-sectional/
 │   │   ├── hooks/         # Custom hooks (useSerial, etc.)
 │   │   ├── services/      # Serial communication service
 │   │   └── types/         # TypeScript type definitions
-│   └── public/        # Static assets + firmware binary
-├── docs/              # GitHub Pages documentation
-│   ├── index.md       # Full build guide
-│   └── kit.md         # Kit information
+│   └── public/        # Static assets
+├── docs/              # GitHub Pages site
+│   ├── index.md       # Full build guide (Jekyll)
+│   ├── kit.md         # Kit information
+│   └── configure/     # Built web config tool (auto-deployed)
+│       └── firmware/  # Firmware binary for web flashing
 ├── pcb files/         # PCB design files (Eagle)
 └── enclosure stl files/  # 3D printable case designs
 ```
@@ -61,16 +63,26 @@ pio run -t uploadfs
 4. Select board: `LOLIN(WEMOS) D1 mini Lite`
 5. Upload
 
-### Dependencies
+### Platform and Dependencies
 
-PlatformIO manages these automatically. For Arduino IDE, install via Library Manager:
+The firmware uses specific pinned versions for compatibility:
 
-- FastLED ^3.10.3
-- WiFiManager ^2.0.17
-- JsonStreamingParser ^1.0.5
-- ArduinoJson ^7.4.2
-- Adafruit TSL2561 ^1.1.2
-- Adafruit Unified Sensor ^1.1.15
+**Platform:** `espressif8266@2.6.3`
+- Newer versions (3.0+) have WiFi interrupt conflicts with FastLED timing that cause only the first LED to light up
+- This version uses Arduino ESP8266 core 2.7.4
+
+**Libraries** (PlatformIO manages these automatically):
+
+| Library | Version | Notes |
+|---------|---------|-------|
+| FastLED | 3.6.0 (pinned) | 3.10+ requires C++ features not in older toolchain |
+| WiFiManager | ^2.0.17 | |
+| JsonStreamingParser | ^1.0.5 | |
+| ArduinoJson | ^7.4.2 | |
+| Adafruit TSL2561 | ^1.1.2 | Optional light sensor |
+| Adafruit Unified Sensor | ^1.1.15 | Required by TSL2561 |
+
+For Arduino IDE, install the equivalent versions via Library Manager.
 
 ## Building the Web App
 
@@ -90,12 +102,16 @@ npm install
 # Start development server
 npm run dev
 
-# Production build
-npm run build
-
-# Deploy to GitHub Pages
-npm run deploy
+# Production build (for local testing)
+VITE_BASE_PATH=/configure/ npm run build
 ```
+
+### Deployment
+
+The web app is deployed automatically via GitHub Actions:
+- Pushes to `web/` trigger the deploy workflow
+- Firmware builds also trigger redeployment (to include updated firmware binary)
+- The app is served from `/configure/` on GitHub Pages
 
 ### Web App Dependencies
 
@@ -206,6 +222,34 @@ Use the "Import from Legacy Config" feature in the Airports tab.
 - **Web Serial API**: Browser-based serial communication (Chrome/Edge/Opera only)
 - **Chunked Transmission**: Large commands sent in 32-byte chunks with delays to prevent ESP8266 serial buffer overflow
 - **Offline Mode**: Airport list can be configured before connecting to hardware
+
+## CI/CD Workflows
+
+The project uses GitHub Actions for automated builds and deployment:
+
+### Build Firmware (`.github/workflows/build-firmware.yml`)
+- Triggers on version tags (`v*`)
+- Builds firmware using PlatformIO
+- Creates GitHub Release with firmware binaries
+
+### Build and Deploy Web Config (`.github/workflows/deploy.yml`)
+- Triggers on pushes to `web/` or when firmware build completes
+- Builds web app with Vite
+- Downloads latest firmware from releases
+- Commits built files to `docs/configure/`
+- GitHub Pages serves from `/docs` (Jekyll for main site, static for `/configure`)
+
+### Creating a Release
+
+```bash
+# Tag and push to trigger build
+git tag v2.0.1
+git push origin v2.0.1
+```
+
+This will:
+1. Build firmware and create GitHub Release
+2. Trigger web deploy to include new firmware binary
 
 ## Contributing
 
