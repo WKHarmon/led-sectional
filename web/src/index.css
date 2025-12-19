@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-900 text-gray-100;
+}
+
+/* Flight category colors */
+.cat-vfr { @apply bg-green-500; }
+.cat-mvfr { @apply bg-blue-500; }
+.cat-ifr { @apply bg-red-500; }
+.cat-lifr { @apply bg-fuchsia-500; }
+.cat-wvfr { @apply bg-yellow-400; }
+.cat-null { @apply bg-gray-700; }
+
+/* LED indicator styling */
+.led-indicator {
+  @apply w-4 h-4 rounded-full border border-gray-600;
+}
+
+/* Drag handle */
+.drag-handle {
+  @apply cursor-grab active:cursor-grabbing;
+}
+
+/* Custom scrollbar for dark mode */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-600 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}

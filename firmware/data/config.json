@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "airports": [
+    "LIFR",
+    "IFR",
+    "MVFR",
+    "WVFR",
+    "VFR",
+    "NULL",
+    "NULL",
+    "NULL"
+  ],
+  "dataPin": 14,
+  "brightness": 20,
+  "ledType": "WS2811",
+  "colorOrder": "RGB",
+  "requestInterval": 900000,
+  "loopInterval": 5000,
+  "windThreshold": 25,
+  "doLightning": true,
+  "doWinds": true,
+  "useLightSensor": false,
+  "lightSensorType": 0,
+  "minBrightness": 20,
+  "maxBrightness": 30,
+  "minLight": 16,
+  "maxLight": 30
+}

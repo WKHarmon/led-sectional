@@ -1,0 +1,253 @@
+#include "serial_cmd.h"
+#include "config.h"
+#include "wifi_manager.h"
+#include "metar.h"
+#include "leds.h"
+#include <ArduinoJson.h>
+
+// Buffer for incoming serial data
+static String serialBuffer = "";
+static const size_t MAX_BUFFER_SIZE = 8192;  // Max command size
+
+// Flag to force a METAR fetch (set by fetch_metars command)
+static bool forceFetchMetars = false;
+
+void serialCmdInit() {
+    Serial.begin(SERIAL_BAUD);
+    delay(100);
+    Serial.println();
+    Serial.println("LED Sectional v2.0");
+    Serial.println("Serial command interface ready");
+}
+
+void serialCmdSendResponse(const String& status, const String& message) {
+    JsonDocument doc;
+    doc["status"] = status;
+    if (message.length() > 0) {
+        doc["message"] = message;
+    }
+    serializeJson(doc, Serial);
+    Serial.println();
+}
+
+void serialCmdSendStatus() {
+    JsonDocument doc;
+
+    doc["status"] = "ok";
+    doc["wifi_connected"] = wifiIsConnected();
+    doc["wifi_ssid"] = wifiGetSSID();
+    doc["ip_address"] = wifiGetIP();
+    doc["needs_wifi_config"] = !wifiHasSavedCredentials();
+    doc["heap_free"] = ESP.getFreeHeap();
+    doc["uptime"] = millis() / 1000;
+    doc["last_metar_update"] = metarGetLastFetchTime() / 1000;
+    doc["metar_count"] = metarGetLastCount();
+    doc["airport_count"] = getConfig().airports.size();
+    doc["brightness"] = ledsGetBrightness();
+    doc["has_lightning"] = ledsHasLightning();
+
+    serializeJson(doc, Serial);
+    Serial.println();
+}
+
+void serialCmdSendConfig() {
+    Config& config = getConfig();
+
+    JsonDocument doc;
+
+    doc["status"] = "ok";
+
+    JsonObject cfg = doc["config"].to<JsonObject>();
+    cfg["version"] = config.version;
+    cfg["dataPin"] = config.dataPin;
+    cfg["brightness"] = config.brightness;
+    cfg["ledType"] = config.ledType;
+    cfg["colorOrder"] = config.colorOrder;
+    cfg["requestInterval"] = config.requestInterval;
+    cfg["loopInterval"] = config.loopInterval;
+    cfg["windThreshold"] = config.windThreshold;
+    cfg["doLightning"] = config.doLightning;
+    cfg["doWinds"] = config.doWinds;
+    cfg["useLightSensor"] = config.useLightSensor;
+    cfg["lightSensorType"] = static_cast<int>(config.lightSensorType);
+    cfg["minBrightness"] = config.minBrightness;
+    cfg["maxBrightness"] = config.maxBrightness;
+    cfg["minLight"] = config.minLight;
+    cfg["maxLight"] = config.maxLight;
+
+    JsonArray airports = cfg["airports"].to<JsonArray>();
+    for (const String& airport : config.airports) {
+        airports.add(airport);
+    }
+
+    serializeJson(doc, Serial);
+    Serial.println();
+}
+
+static void processCommand(const String& cmdJson) {
+    // Debug: show command length and heap
+    Serial.printf("Processing command (%d bytes, heap: %d)\n",
+                  cmdJson.length(), ESP.getFreeHeap());
+
+    // Parse incoming JSON command
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, cmdJson);
+
+    if (error) {
+        Serial.printf("JSON parse error: %s (heap: %d)\n", error.c_str(), ESP.getFreeHeap());
+        serialCmdSendResponse("error", String("JSON error: ") + error.c_str());
+        return;
+    }
+
+    String cmd = doc["cmd"] | "";
+
+    if (cmd.length() == 0) {
+        Serial.println("Warning: empty command field");
+        Serial.printf("First 100 chars: %.100s\n", cmdJson.c_str());
+    }
+
+    if (cmd == "get_config") {
+        serialCmdSendConfig();
+    }
+    else if (cmd == "set_config") {
+        Config& config = getConfig();
+
+        // Update configuration from JSON
+        JsonObject cfg = doc["config"];
+        if (cfg) {
+            if (cfg["brightness"].is<int>()) config.brightness = cfg["brightness"];
+            if (cfg["windThreshold"].is<int>()) config.windThreshold = cfg["windThreshold"];
+            if (cfg["doLightning"].is<bool>()) config.doLightning = cfg["doLightning"];
+            if (cfg["doWinds"].is<bool>()) config.doWinds = cfg["doWinds"];
+            if (cfg["useLightSensor"].is<bool>()) config.useLightSensor = cfg["useLightSensor"];
+            if (cfg["lightSensorType"].is<int>()) config.lightSensorType = static_cast<LightSensorType>((int)cfg["lightSensorType"]);
+            if (cfg["minBrightness"].is<int>()) config.minBrightness = cfg["minBrightness"];
+            if (cfg["maxBrightness"].is<int>()) config.maxBrightness = cfg["maxBrightness"];
+            if (cfg["minLight"].is<int>()) config.minLight = cfg["minLight"];
+            if (cfg["maxLight"].is<int>()) config.maxLight = cfg["maxLight"];
+            if (cfg["requestInterval"].is<unsigned long>()) config.requestInterval = cfg["requestInterval"];
+            if (cfg["loopInterval"].is<unsigned long>()) config.loopInterval = cfg["loopInterval"];
+            if (cfg["dataPin"].is<int>()) config.dataPin = cfg["dataPin"];
+
+            // Handle airports array
+            JsonArray airports = cfg["airports"];
+            if (airports) {
+                config.airports.clear();
+                for (JsonVariant airport : airports) {
+                    config.airports.push_back(airport.as<String>());
+                }
+            }
+
+            // Save to flash
+            if (configSave(config)) {
+                // Apply brightness change immediately
+                ledsSetBrightness(config.brightness);
+                ledsShow();
+                serialCmdSendResponse("ok", "Configuration saved");
+            } else {
+                serialCmdSendResponse("error", "Failed to save configuration");
+            }
+        } else {
+            serialCmdSendResponse("error", "Missing config object");
+        }
+    }
+    else if (cmd == "get_status") {
+        serialCmdSendStatus();
+    }
+    else if (cmd == "set_wifi") {
+        String ssid = doc["ssid"] | "";
+        String pass = doc["pass"] | "";
+
+        if (ssid.length() > 0) {
+            serialCmdSendResponse("ok", "WiFi credentials updated - rebooting");
+            delay(100);
+            wifiSetCredentials(ssid, pass);
+            // Note: wifiSetCredentials will reboot the device
+        } else {
+            serialCmdSendResponse("error", "Missing SSID");
+        }
+    }
+    else if (cmd == "reset_wifi") {
+        serialCmdSendResponse("ok", "WiFi settings cleared - rebooting");
+        delay(100);
+        wifiResetSettings();
+        // Note: wifiResetSettings will reboot the device
+    }
+    else if (cmd == "reboot") {
+        serialCmdSendResponse("ok", "Rebooting");
+        delay(100);
+        ESP.restart();
+    }
+    else if (cmd == "factory_reset") {
+        Config& config = getConfig();
+        configSetDefaults(config);
+        configSave(config);
+        serialCmdSendResponse("ok", "Factory reset complete - rebooting");
+        delay(100);
+        wifiResetSettings();
+    }
+    else if (cmd == "test_leds") {
+        // Test all LEDs with a rainbow pattern
+        int numLeds = getConfig().airports.size();
+        for (int i = 0; i < numLeds; i++) {
+            ledsSetColor(i, CHSV((i * 255) / numLeds, 255, 255));
+        }
+        ledsShow();
+        serialCmdSendResponse("ok", "LED test pattern displayed");
+    }
+    else if (cmd == "fetch_metars") {
+        // Force an immediate METAR fetch
+        forceFetchMetars = true;
+        serialCmdSendResponse("ok", "METAR fetch queued");
+    }
+    else {
+        serialCmdSendResponse("error", "Unknown command: " + cmd);
+    }
+}
+
+// Track when we last received data for command completion detection
+static unsigned long lastSerialDataTime = 0;
+static const unsigned long SERIAL_IDLE_TIMEOUT = 50;  // ms to wait for more data
+
+void serialCmdProcess() {
+    // Read all available data into buffer
+    while (Serial.available()) {
+        char c = Serial.read();
+        lastSerialDataTime = millis();
+
+        if (c == '\n' || c == '\r') {
+            // End of command
+            if (serialBuffer.length() > 0) {
+                processCommand(serialBuffer);
+                serialBuffer = "";
+            }
+        } else {
+            // Add to buffer
+            if (serialBuffer.length() < MAX_BUFFER_SIZE) {
+                serialBuffer += c;
+            } else {
+                // Buffer overflow - discard
+                Serial.println("{\"status\":\"error\",\"message\":\"Command too long\"}");
+                serialBuffer = "";
+            }
+        }
+    }
+
+    // If we have partial data and haven't received anything for a while,
+    // it might be a truncated command - log for debugging
+    if (serialBuffer.length() > 0 && lastSerialDataTime > 0) {
+        if (millis() - lastSerialDataTime > SERIAL_IDLE_TIMEOUT * 10) {
+            Serial.printf("Warning: incomplete command in buffer (%d bytes), clearing\n", serialBuffer.length());
+            serialBuffer = "";
+            lastSerialDataTime = 0;
+        }
+    }
+}
+
+bool serialCmdCheckForceFetch() {
+    if (forceFetchMetars) {
+        forceFetchMetars = false;
+        return true;
+    }
+    return false;
+}

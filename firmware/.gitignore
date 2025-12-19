@@ -1,0 +1,16 @@
+# PlatformIO build artifacts
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# IDE files
+.vscode/
+.idea/
+
+# Build output
+*.bin
+*.elf
+
+# OS files
+.DS_Store
+Thumbs.db
