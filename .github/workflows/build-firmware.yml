@@ -29,21 +29,28 @@ jobs:
           cd firmware
           pio run -e d1_mini_lite
 
-      - name: Rename firmware binary
+      - name: Prepare firmware binaries
         run: |
+          # Create versioned copy for release notes
           cp firmware/.pio/build/d1_mini_lite/firmware.bin led-sectional-${{ github.ref_name }}.bin
+          # Create unversioned copy for "latest" URL pattern
+          cp firmware/.pio/build/d1_mini_lite/firmware.bin led-sectional.bin
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
         with:
           name: firmware-${{ github.ref_name }}
-          path: led-sectional-${{ github.ref_name }}.bin
+          path: |
+            led-sectional-${{ github.ref_name }}.bin
+            led-sectional.bin
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: led-sectional-${{ github.ref_name }}.bin
+          files: |
+            led-sectional-${{ github.ref_name }}.bin
+            led-sectional.bin
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

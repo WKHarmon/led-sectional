@@ -1,2 +1,3 @@
-# Placeholder for firmware binaries
-# The led-sectional.bin file should be placed here after building the firmware
+# Firmware is fetched from GitHub Releases at runtime
+# See manifest.json for the download URL
+# Binary files are not stored in git
