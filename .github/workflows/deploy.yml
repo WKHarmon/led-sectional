@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Build and Deploy Web Config
 
 on:
   push:
@@ -13,25 +13,18 @@ on:
       - completed
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+  contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     # Only run if triggered directly OR if firmware build succeeded
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    defaults:
-      run:
-        working-directory: web
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -41,41 +34,53 @@ jobs:
           cache-dependency-path: web/package-lock.json
 
       - name: Install dependencies
+        working-directory: web
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Build web app
+        working-directory: web
+        run: VITE_BASE_PATH=/configure/ npm run build
 
       - name: Download firmware from latest release
         run: |
-          mkdir -p dist/firmware
+          mkdir -p web/dist/firmware
           # Download firmware binary from latest release
-          curl -L -o dist/firmware/led-sectional.bin \
+          curl -L -o web/dist/firmware/led-sectional.bin \
             "https://github.com/${{ github.repository }}/releases/latest/download/led-sectional.bin" || true
           # Check if download succeeded
-          if [ -f dist/firmware/led-sectional.bin ] && [ -s dist/firmware/led-sectional.bin ]; then
+          if [ -f web/dist/firmware/led-sectional.bin ] && [ -s web/dist/firmware/led-sectional.bin ]; then
             echo "Firmware downloaded successfully"
-            ls -la dist/firmware/
+            ls -la web/dist/firmware/
           else
             echo "Warning: Could not download firmware from release"
-            rm -f dist/firmware/led-sectional.bin
+            rm -f web/dist/firmware/led-sectional.bin
           fi
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+      - name: Update docs/configure
+        run: |
+          # Remove old configure files (except .gitkeep if any)
+          rm -rf docs/configure/assets
+          rm -f docs/configure/index.html
+          rm -rf docs/configure/firmware
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: web/dist
+          # Copy new build
+          cp -r web/dist/* docs/configure/
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          # Ensure .nojekyll exists
+          touch docs/configure/.nojekyll
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/configure/
+
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update web config tool
+
+          🤖 Generated with GitHub Actions"
+            git push
+          fi
