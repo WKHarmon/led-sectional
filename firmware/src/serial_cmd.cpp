@@ -130,18 +130,26 @@ static void processCommand(const String& cmdJson) {
             if (cfg["dataPin"].is<int>()) config.dataPin = cfg["dataPin"];
 
             // Handle airports array
+            bool airportsChanged = false;
             JsonArray airports = cfg["airports"];
             if (airports) {
                 config.airports.clear();
                 for (JsonVariant airport : airports) {
                     config.airports.push_back(airport.as<String>());
                 }
+                airportsChanged = true;
             }
 
             // Save to flash
             if (configSave(config)) {
                 // Apply brightness change immediately
                 ledsSetBrightness(config.brightness);
+
+                // Update LED count if airports changed
+                if (airportsChanged) {
+                    ledsUpdateCount(config.airports.size());
+                }
+
                 ledsShow();
                 serialCmdSendResponse("ok", "Configuration saved");
             } else {
