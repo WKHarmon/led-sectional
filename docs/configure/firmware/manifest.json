@@ -8,7 +8,7 @@
       "chipFamily": "ESP8266",
       "parts": [
         {
-          "path": "https://github.com/WKHarmon/led-sectional/releases/latest/download/led-sectional.bin",
+          "path": "led-sectional.bin",
           "offset": 0
         }
       ]

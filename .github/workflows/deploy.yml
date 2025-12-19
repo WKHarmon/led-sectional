@@ -7,6 +7,10 @@ on:
       - 'web/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Build Firmware"]
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -20,6 +24,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Only run if triggered directly OR if firmware build succeeded
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     defaults:
       run:
         working-directory: web
@@ -39,6 +45,21 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Download firmware from latest release
+        run: |
+          mkdir -p dist/firmware
+          # Download firmware binary from latest release
+          curl -L -o dist/firmware/led-sectional.bin \
+            "https://github.com/${{ github.repository }}/releases/latest/download/led-sectional.bin" || true
+          # Check if download succeeded
+          if [ -f dist/firmware/led-sectional.bin ] && [ -s dist/firmware/led-sectional.bin ]; then
+            echo "Firmware downloaded successfully"
+            ls -la dist/firmware/
+          else
+            echo "Warning: Could not download firmware from release"
+            rm -f dist/firmware/led-sectional.bin
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
