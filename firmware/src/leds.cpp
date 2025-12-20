@@ -163,6 +163,10 @@ void ledsSetLegend() {
             leds[i] = COLOR_LIFR;
         } else if (code == "WVFR") {
             leds[i] = COLOR_WVFR;
+        } else if (code == "LTNG") {
+            // Test lightning: show VFR color and add to lightning list
+            leds[i] = COLOR_VFR;
+            ledsAddLightning(i);
         }
         // NULL entries remain at whatever color they were (usually black)
     }

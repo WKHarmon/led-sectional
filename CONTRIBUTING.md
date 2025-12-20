@@ -209,6 +209,24 @@ std::vector<String> airports({
 
 Use the "Import from Legacy Config" feature in the Airports tab.
 
+## Testing Features
+
+### Special Airport Codes
+
+The following special codes can be used in the airport list for testing and legend display:
+
+| Code | Purpose |
+|------|---------|
+| `VFR` | Legend LED - shows VFR green |
+| `MVFR` | Legend LED - shows MVFR blue |
+| `IFR` | Legend LED - shows IFR red |
+| `LIFR` | Legend LED - shows LIFR magenta |
+| `WVFR` | Legend LED - shows windy VFR yellow |
+| `NULL` | Placeholder - LED stays off |
+| `LTNG` | **Dev only** - Tests lightning animation (shows VFR green with periodic white flash) |
+
+The `LTNG` code is useful for validating that the lightning flash animation works correctly, since thunderstorms may not always be present at configured airports.
+
 ## Architecture Notes
 
 ### Firmware

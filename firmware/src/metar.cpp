@@ -14,7 +14,8 @@ static MetarProcessCallback currentCallback = nullptr;
 // Special airport codes that shouldn't be fetched
 static bool isSpecialCode(const String& code) {
     return code == "NULL" || code == "VFR" || code == "MVFR" ||
-           code == "IFR" || code == "LIFR" || code == "WVFR";
+           code == "IFR" || code == "LIFR" || code == "WVFR" ||
+           code == "LTNG";
 }
 
 // Find the LED index for an airport ICAO code
