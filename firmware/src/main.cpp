@@ -225,8 +225,8 @@ void loop() {
             ledsSetAll(COLOR_FETCH_ERROR);
             ledsShow();
 
-            // Retry sooner on failure
-            lastMetarFetch = currentTime - config.requestInterval + 15000;
+            // Retry after 60 seconds on failure (not too aggressive on the API)
+            lastMetarFetch = currentTime - config.requestInterval + 60000;
         }
 
         digitalWrite(LED_BUILTIN, HIGH);  // LED off
