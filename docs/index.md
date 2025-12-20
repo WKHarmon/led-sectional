@@ -114,7 +114,7 @@ On power on, all LEDs will show orange initially. Once the controller is connect
 
 ## Manual Setup (Advanced)
 
-If you prefer to program the board manually, the source code is available at [https://github.com/WKHarmon/led-sectional](https://github.com/WKHarmon/led-sectional). See the [CONTRIBUTING.md](https://github.com/WKHarmon/led-sectional/blob/master/CONTRIBUTING.md) file for development instructions.
+If you prefer to program the board manually, the source code is available at [https://github.com/WKHarmon/led-sectional](https://github.com/WKHarmon/led-sectional). See the [CONTRIBUTING.md](https://github.com/WKHarmon/led-sectional/blob/main/CONTRIBUTING.md) file for development instructions.
 
 
 # Assembly

@@ -2,7 +2,7 @@ name: Build and Deploy Web Config
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
     paths:
       - 'web/**'
       - '.github/workflows/deploy.yml'
