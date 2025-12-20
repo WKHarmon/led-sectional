@@ -104,6 +104,16 @@ In the Configuration Tool's **Settings** tab, you can adjust:
 - **High Wind Indication** - Enable/disable yellow for high winds
 - **Light Sensor** - Enable automatic brightness based on room lighting (requires additional hardware)
 
+### Home Assistant Integration
+
+The LED Sectional can integrate with Home Assistant for smart home control. Once configured, your sectional appears as a light in Home Assistant where you can:
+
+- Turn the display on/off
+- Adjust brightness
+- Include in automations (e.g., dim at night, turn off when away)
+
+To set up, go to **Settings > Advanced Settings** in the Configuration Tool and enable MQTT. Enter your Home Assistant's MQTT broker address and credentials. The device will automatically appear in Home Assistant via MQTT Discovery.
+
 ## More Information
 
 - [Full Build Guide](docs/index.md) - Detailed instructions for building your sectional

@@ -13,6 +13,7 @@ static PubSubClient mqttClient(espClient);
 static char topicDiscovery[64];
 static char topicCommand[48];
 static char topicState[48];
+static char topicAvailability[48];
 static char clientId[32];
 
 // Reconnection timing
@@ -27,19 +28,27 @@ static void buildTopics() {
     snprintf(topicDiscovery, sizeof(topicDiscovery), "homeassistant/light/%s/config", clientId);
     snprintf(topicCommand, sizeof(topicCommand), "%s/set", clientId);
     snprintf(topicState, sizeof(topicState), "%s/state", clientId);
+    snprintf(topicAvailability, sizeof(topicAvailability), "%s/availability", clientId);
 }
 
 // Publish Home Assistant discovery payload
 static void publishDiscovery() {
     JsonDocument doc;
 
-    doc["name"] = "LED Sectional";
+    // Setting name to null makes this the primary entity for the device,
+    // so it shows as just "LED Sectional" instead of "LED Sectional LED Sectional"
+    doc["name"] = (char*)NULL;
     doc["unique_id"] = clientId;
     doc["command_topic"] = topicCommand;
     doc["state_topic"] = topicState;
     doc["schema"] = "json";
     doc["brightness"] = true;
     doc["brightness_scale"] = 255;
+
+    // Availability (LWT)
+    doc["availability_topic"] = topicAvailability;
+    doc["payload_available"] = "online";
+    doc["payload_not_available"] = "offline";
 
     // Device info for HA device registry
     JsonObject device = doc["device"].to<JsonObject>();
@@ -98,15 +107,25 @@ static void mqttCallback(char* topic, byte* payload, unsigned int length) {
         if (brightness < 0) brightness = 0;
         if (brightness > 255) brightness = 255;
 
-        if (brightness != config.brightness) {
-            config.brightness = brightness;
-            // Only apply brightness if power is on
-            if (config.powerOn) {
-                ledsSetBrightness(config.brightness);
-                ledsShow();
+        if (config.useLightSensor) {
+            // Light sensor active: control maxBrightness instead
+            // The sensor will auto-adjust between minBrightness and this new max
+            if (brightness != config.maxBrightness) {
+                config.maxBrightness = brightness;
+                brightnessChanged = true;
+                Serial.printf("MQTT: Max brightness set to %d (light sensor active)\n", brightness);
             }
-            brightnessChanged = true;
-            Serial.printf("MQTT: Brightness set to %d\n", config.brightness);
+        } else {
+            // No light sensor: control brightness directly
+            if (brightness != config.brightness) {
+                config.brightness = brightness;
+                if (config.powerOn) {
+                    ledsSetBrightness(config.brightness);
+                    ledsShow();
+                }
+                brightnessChanged = true;
+                Serial.printf("MQTT: Brightness set to %d\n", config.brightness);
+            }
         }
     }
 
@@ -157,18 +176,31 @@ void mqttLoop() {
     Serial.printf("MQTT: Connecting to %s:%d...\n",
                   config.mqttBroker.c_str(), config.mqttPort);
 
+    // Connect with LWT (Last Will and Testament) for availability tracking
+    // LWT will publish "offline" if we disconnect unexpectedly
     bool connected;
     if (config.mqttUsername.length() > 0) {
         connected = mqttClient.connect(clientId,
                                        config.mqttUsername.c_str(),
-                                       config.mqttPassword.c_str());
+                                       config.mqttPassword.c_str(),
+                                       topicAvailability,  // LWT topic
+                                       0,                   // LWT QoS
+                                       true,                // LWT retain
+                                       "offline");          // LWT message
     } else {
-        connected = mqttClient.connect(clientId);
+        connected = mqttClient.connect(clientId,
+                                       topicAvailability,  // LWT topic
+                                       0,                   // LWT QoS
+                                       true,                // LWT retain
+                                       "offline");          // LWT message
     }
 
     if (connected) {
         Serial.println("MQTT: Connected");
         reconnectInterval = 1000;  // Reset backoff on success
+
+        // Publish availability (we're online)
+        mqttClient.publish(topicAvailability, "online", true);
 
         // Subscribe to command topic
         if (mqttClient.subscribe(topicCommand)) {
@@ -203,7 +235,9 @@ void mqttPublishState() {
 
     JsonDocument doc;
     doc["state"] = config.powerOn ? "ON" : "OFF";
-    doc["brightness"] = config.brightness;
+    // Report maxBrightness when light sensor is active (that's what MQTT controls),
+    // otherwise report the direct brightness setting
+    doc["brightness"] = config.useLightSensor ? config.maxBrightness : config.brightness;
 
     char payload[64];
     serializeJson(doc, payload, sizeof(payload));

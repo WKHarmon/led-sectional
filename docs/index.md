@@ -102,6 +102,7 @@ The easiest way to set up your LED Sectional is using the **[LED Sectional Confi
 * **Configure WiFi** by entering your network credentials
 * **Set up your airport list** with a drag-and-drop interface
 * **Adjust settings** like brightness, wind thresholds, and lightning effects
+* **Connect to Home Assistant** for smart home control (optional)
 
 Just connect your controller via USB, open the tool in Chrome, Edge, or Opera, and follow the on-screen instructions.
 

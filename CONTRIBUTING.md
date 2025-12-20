@@ -13,6 +13,7 @@ led-sectional/
 │   │   ├── wifi_manager.cpp/h  # WiFi handling
 │   │   ├── metar.cpp/h    # METAR fetching and parsing
 │   │   ├── leds.cpp/h     # LED control
+│   │   ├── mqtt.cpp/h     # MQTT / Home Assistant integration
 │   │   ├── light_sensor.cpp/h  # Light sensor support
 │   │   └── serial_cmd.cpp/h    # Serial command interface
 │   ├── data/          # LittleFS filesystem (default config)
@@ -79,6 +80,7 @@ The firmware uses specific pinned versions for compatibility:
 | WiFiManager | ^2.0.17 | |
 | JsonStreamingParser | ^1.0.5 | |
 | ArduinoJson | ^7.4.2 | |
+| PubSubClient | ^2.8 | MQTT client for Home Assistant integration |
 | Adafruit TSL2561 | ^1.1.2 | Optional light sensor |
 | Adafruit Unified Sensor | ^1.1.15 | Required by TSL2561 |
 
@@ -148,6 +150,9 @@ The device accepts JSON commands over serial at 115200 baud. This is how the web
 
 // Update configuration (partial updates supported)
 {"cmd": "set_config", "config": {"brightness": 30}}
+
+// Enable MQTT for Home Assistant
+{"cmd": "set_config", "config": {"mqttEnabled": true, "mqttBroker": "192.168.1.100", "mqttPort": 1883}}
 
 // Set WiFi credentials
 {"cmd": "set_wifi", "ssid": "MyNetwork", "pass": "password"}
@@ -234,6 +239,7 @@ The `LTNG` code is useful for validating that the lightning flash animation work
 - **Streaming JSON Parser**: METARs are parsed as they stream in to minimize memory usage. This allows support for 150+ airports on the memory-constrained ESP8266.
 - **WiFi Manager**: Uses WiFiManager library for captive portal configuration. Fresh devices wait for serial WiFi configuration; AP mode is only used as fallback when saved credentials fail.
 - **Configuration Storage**: Settings stored in LittleFS as JSON.
+- **MQTT / Home Assistant**: Optional integration using PubSubClient. Uses MQTT Discovery for automatic device registration in Home Assistant. Device appears as a light entity with on/off and brightness control. Power state persists across reboots.
 
 ### Web App
 
