@@ -153,6 +153,12 @@ String configToJson(const Config& config) {
     doc["maxBrightness"] = config.maxBrightness;
     doc["minLight"] = config.minLight;
     doc["maxLight"] = config.maxLight;
+    doc["mqttEnabled"] = config.mqttEnabled;
+    doc["mqttBroker"] = config.mqttBroker;
+    doc["mqttPort"] = config.mqttPort;
+    doc["mqttUsername"] = config.mqttUsername;
+    doc["mqttPassword"] = config.mqttPassword;
+    doc["powerOn"] = config.powerOn;
 
     JsonArray airportsArray = doc["airports"].to<JsonArray>();
     for (const String& airport : config.airports) {
@@ -190,6 +196,12 @@ bool configFromJson(const String& json, Config& config) {
     config.maxBrightness = doc["maxBrightness"] | DEFAULT_MAX_BRIGHTNESS;
     config.minLight = doc["minLight"] | DEFAULT_MIN_LIGHT;
     config.maxLight = doc["maxLight"] | DEFAULT_MAX_LIGHT;
+    config.mqttEnabled = doc["mqttEnabled"] | DEFAULT_MQTT_ENABLED;
+    config.mqttBroker = doc["mqttBroker"] | DEFAULT_MQTT_BROKER;
+    config.mqttPort = doc["mqttPort"] | DEFAULT_MQTT_PORT;
+    config.mqttUsername = doc["mqttUsername"] | DEFAULT_MQTT_USERNAME;
+    config.mqttPassword = doc["mqttPassword"] | DEFAULT_MQTT_PASSWORD;
+    config.powerOn = doc["powerOn"] | DEFAULT_POWER_ON;
 
     // Load airports array
     config.airports.clear();

@@ -41,6 +41,12 @@ export function DeviceSettings({
       requestInterval: config.requestInterval,
       loopInterval: config.loopInterval,
       dataPin: config.dataPin,
+      mqttEnabled: config.mqttEnabled,
+      mqttBroker: config.mqttBroker,
+      mqttPort: config.mqttPort,
+      mqttUsername: config.mqttUsername,
+      mqttPassword: config.mqttPassword,
+      powerOn: config.powerOn,
     });
     setHasChanges(false);
   }, [config]);
@@ -331,7 +337,7 @@ export function DeviceSettings({
         </button>
 
         {showAdvanced && (
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-1">
                 LED Data Pin (GPIO)
@@ -347,6 +353,89 @@ export function DeviceSettings({
               <p className="mt-1 text-xs text-gray-500">
                 Only change this if you have an older board with LEDs on a different pin.
               </p>
+            </div>
+
+            {/* MQTT / Home Assistant */}
+            <div className="pt-4 border-t border-gray-600">
+              <div className="flex items-center justify-between mb-4">
+                <label className="text-sm font-medium text-gray-400">
+                  Enable MQTT (Home Assistant)
+                </label>
+                <button
+                  onClick={() => updateConfig('mqttEnabled', !localConfig.mqttEnabled)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    localConfig.mqttEnabled ? 'bg-blue-600' : 'bg-gray-600'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      localConfig.mqttEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {localConfig.mqttEnabled && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                      MQTT Broker
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="192.168.1.100 or mqtt.example.com"
+                      value={localConfig.mqttBroker || ''}
+                      onChange={(e) => updateConfig('mqttBroker', e.target.value)}
+                      className="w-full bg-gray-700 rounded-lg px-3 py-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                      MQTT Port
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="65535"
+                      value={localConfig.mqttPort || 1883}
+                      onChange={(e) => updateConfig('mqttPort', parseInt(e.target.value))}
+                      className="w-full bg-gray-700 rounded-lg px-3 py-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                      Username (optional)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Leave empty if no authentication"
+                      value={localConfig.mqttUsername || ''}
+                      onChange={(e) => updateConfig('mqttUsername', e.target.value)}
+                      className="w-full bg-gray-700 rounded-lg px-3 py-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">
+                      Password (optional)
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Leave empty if no authentication"
+                      value={localConfig.mqttPassword || ''}
+                      onChange={(e) => updateConfig('mqttPassword', e.target.value)}
+                      className="w-full bg-gray-700 rounded-lg px-3 py-2"
+                    />
+                  </div>
+
+                  <p className="text-xs text-gray-500">
+                    The device will automatically appear in Home Assistant via MQTT Discovery.
+                    You can control power and brightness from the Home Assistant dashboard.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}

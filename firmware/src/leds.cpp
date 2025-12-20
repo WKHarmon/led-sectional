@@ -101,6 +101,23 @@ uint8_t ledsGetBrightness() {
     return FastLED.getBrightness();
 }
 
+void ledsSetPower(bool on) {
+    Config& config = getConfig();
+    if (on) {
+        // Restore configured brightness
+        FastLED.setBrightness(config.brightness);
+    } else {
+        // Turn off by setting brightness to 0
+        FastLED.setBrightness(0);
+    }
+    FastLED.show();
+}
+
+bool ledsGetPower() {
+    // Power is on if brightness > 0
+    return FastLED.getBrightness() > 0;
+}
+
 void ledsAddLightning(int index) {
     if (index < 0 || index >= numLeds) return;
 

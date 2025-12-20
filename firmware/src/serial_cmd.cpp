@@ -3,6 +3,7 @@
 #include "wifi_manager.h"
 #include "metar.h"
 #include "leds.h"
+#include "mqtt.h"
 #include <ArduinoJson.h>
 
 // Buffer for incoming serial data
@@ -74,6 +75,12 @@ void serialCmdSendConfig() {
     cfg["maxBrightness"] = config.maxBrightness;
     cfg["minLight"] = config.minLight;
     cfg["maxLight"] = config.maxLight;
+    cfg["mqttEnabled"] = config.mqttEnabled;
+    cfg["mqttBroker"] = config.mqttBroker;
+    cfg["mqttPort"] = config.mqttPort;
+    cfg["mqttUsername"] = config.mqttUsername;
+    cfg["mqttPassword"] = config.mqttPassword;
+    cfg["powerOn"] = config.powerOn;
 
     JsonArray airports = cfg["airports"].to<JsonArray>();
     for (const String& airport : config.airports) {
@@ -129,6 +136,30 @@ static void processCommand(const String& cmdJson) {
             if (cfg["loopInterval"].is<unsigned long>()) config.loopInterval = cfg["loopInterval"];
             if (cfg["dataPin"].is<int>()) config.dataPin = cfg["dataPin"];
 
+            // MQTT settings
+            bool mqttChanged = false;
+            if (cfg["mqttEnabled"].is<bool>()) {
+                if (config.mqttEnabled != cfg["mqttEnabled"].as<bool>()) mqttChanged = true;
+                config.mqttEnabled = cfg["mqttEnabled"];
+            }
+            if (cfg["mqttBroker"].is<const char*>()) {
+                if (config.mqttBroker != cfg["mqttBroker"].as<const char*>()) mqttChanged = true;
+                config.mqttBroker = cfg["mqttBroker"].as<String>();
+            }
+            if (cfg["mqttPort"].is<int>()) {
+                if (config.mqttPort != cfg["mqttPort"].as<int>()) mqttChanged = true;
+                config.mqttPort = cfg["mqttPort"];
+            }
+            if (cfg["mqttUsername"].is<const char*>()) {
+                config.mqttUsername = cfg["mqttUsername"].as<String>();
+            }
+            if (cfg["mqttPassword"].is<const char*>()) {
+                config.mqttPassword = cfg["mqttPassword"].as<String>();
+            }
+            if (cfg["powerOn"].is<bool>()) {
+                config.powerOn = cfg["powerOn"];
+            }
+
             // Validate and clamp config values
             if (config.brightness < 0) config.brightness = 0;
             if (config.brightness > 255) config.brightness = 255;
@@ -140,6 +171,7 @@ static void processCommand(const String& cmdJson) {
             if (config.minBrightness > 255) config.minBrightness = 255;
             if (config.maxBrightness < 0) config.maxBrightness = 0;
             if (config.maxBrightness > 255) config.maxBrightness = 255;
+            if (config.mqttPort < 1 || config.mqttPort > 65535) config.mqttPort = 1883;
 
             // Handle airports array
             bool airportsChanged = false;
@@ -154,12 +186,27 @@ static void processCommand(const String& cmdJson) {
 
             // Save to flash
             if (configSave(config)) {
-                // Apply brightness change immediately
-                ledsSetBrightness(config.brightness);
+                // Apply brightness change immediately (if power is on)
+                if (config.powerOn) {
+                    ledsSetBrightness(config.brightness);
+                }
+
+                // Apply power state
+                ledsSetPower(config.powerOn);
 
                 // Update LED count if airports changed
                 if (airportsChanged) {
                     ledsUpdateCount(config.airports.size());
+                }
+
+                // Reinitialize MQTT if settings changed
+                if (mqttChanged) {
+                    mqttInit();
+                }
+
+                // Publish state to MQTT if connected
+                if (mqttIsConnected()) {
+                    mqttPublishState();
                 }
 
                 ledsShow();

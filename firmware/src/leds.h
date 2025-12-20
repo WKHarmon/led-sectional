@@ -48,6 +48,12 @@ void ledsSetBrightness(uint8_t brightness);
 // Get current brightness
 uint8_t ledsGetBrightness();
 
+// Set power state (on/off)
+void ledsSetPower(bool on);
+
+// Get power state
+bool ledsGetPower();
+
 // Add an LED to the lightning list (for thunderstorm animation)
 void ledsAddLightning(int index);
 

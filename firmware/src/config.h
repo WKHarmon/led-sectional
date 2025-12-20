@@ -32,6 +32,14 @@
 #define DEFAULT_MIN_LIGHT 16
 #define DEFAULT_MAX_LIGHT 30
 
+// MQTT defaults
+#define DEFAULT_MQTT_ENABLED false
+#define DEFAULT_MQTT_BROKER ""
+#define DEFAULT_MQTT_PORT 1883
+#define DEFAULT_MQTT_USERNAME ""
+#define DEFAULT_MQTT_PASSWORD ""
+#define DEFAULT_POWER_ON true
+
 // WiFi reset button
 #define WIFI_RESET_PIN 0  // GPIO0 (FLASH button on most boards)
 
@@ -72,6 +80,16 @@ struct Config {
     int minLight;
     int maxLight;
 
+    // MQTT settings
+    bool mqttEnabled;
+    String mqttBroker;
+    uint16_t mqttPort;
+    String mqttUsername;
+    String mqttPassword;
+
+    // Power state (controlled via MQTT or web)
+    bool powerOn;
+
     // Constructor with defaults
     Config() {
         version = CONFIG_VERSION;
@@ -90,6 +108,12 @@ struct Config {
         maxBrightness = DEFAULT_MAX_BRIGHTNESS;
         minLight = DEFAULT_MIN_LIGHT;
         maxLight = DEFAULT_MAX_LIGHT;
+        mqttEnabled = DEFAULT_MQTT_ENABLED;
+        mqttBroker = DEFAULT_MQTT_BROKER;
+        mqttPort = DEFAULT_MQTT_PORT;
+        mqttUsername = DEFAULT_MQTT_USERNAME;
+        mqttPassword = DEFAULT_MQTT_PASSWORD;
+        powerOn = DEFAULT_POWER_ON;
     }
 
     // Get number of LEDs (derived from airports size)

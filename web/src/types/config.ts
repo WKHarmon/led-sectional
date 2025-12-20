@@ -23,6 +23,12 @@ export interface DeviceConfig {
   maxBrightness: number;
   minLight: number;
   maxLight: number;
+  mqttEnabled: boolean;
+  mqttBroker: string;
+  mqttPort: number;
+  mqttUsername: string;
+  mqttPassword: string;
+  powerOn: boolean;
   airports: string[];
 }
 
@@ -101,5 +107,11 @@ export const DEFAULT_CONFIG: DeviceConfig = {
   maxBrightness: 30,
   minLight: 16,
   maxLight: 30,
+  mqttEnabled: false,
+  mqttBroker: '',
+  mqttPort: 1883,
+  mqttUsername: '',
+  mqttPassword: '',
+  powerOn: true,
   airports: [],
 };

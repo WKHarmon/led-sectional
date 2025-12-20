@@ -22,6 +22,7 @@
 #include "leds.h"
 #include "light_sensor.h"
 #include "serial_cmd.h"
+#include "mqtt.h"
 
 // State tracking
 static unsigned long lastMetarFetch = 0;
@@ -120,6 +121,15 @@ void setup() {
     // Initialize METAR fetching
     metarInit();
 
+    // Initialize MQTT for Home Assistant integration
+    mqttInit();
+
+    // Apply saved power state
+    if (!config.powerOn) {
+        ledsSetPower(false);
+        Serial.println("Power state: OFF (from saved config)");
+    }
+
     digitalWrite(LED_BUILTIN, HIGH);  // LED off, startup complete
 
     Serial.printf("Setup complete (free heap: %d bytes)\n", ESP.getFreeHeap());
@@ -159,6 +169,22 @@ void loop() {
         ledsSetAll(COLOR_WIFI_CONNECTED);
         ledsShow();
         delay(500);
+    }
+
+    // MQTT loop - handles connection and message processing
+    mqttLoop();
+
+    // Skip display updates if power is off
+    if (!config.powerOn) {
+        // Still need to process serial and MQTT, but skip LED updates
+        unsigned long waitStart = millis();
+        while (millis() - waitStart < config.loopInterval) {
+            serialCmdProcess();
+            mqttLoop();
+            delay(10);
+            yield();
+        }
+        return;
     }
 
     // Adjust brightness if light sensor is enabled
@@ -234,11 +260,12 @@ void loop() {
         Serial.println("----------------------------------------");
     }
 
-    // Wait for next loop iteration, but keep processing serial commands
+    // Wait for next loop iteration, but keep processing serial and MQTT
     // This prevents serial buffer overflow during long delays
     unsigned long waitStart = millis();
     while (millis() - waitStart < config.loopInterval) {
         serialCmdProcess();  // Keep draining serial buffer
+        mqttLoop();          // Keep MQTT connection alive
         delay(10);  // Small delay to prevent tight loop
         yield();
     }
