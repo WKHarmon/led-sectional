@@ -196,11 +196,25 @@ void loop() {
         ledsClearLightning();
         ledsClear();
 
-        // Fetch and process METARs
-        if (metarFetch(onMetarReceived)) {
-            Serial.printf("Successfully fetched %d METARs\n", metarGetLastCount());
+        // Check if there are any real airports to fetch
+        String airportString = metarBuildAirportString();
+        bool fetchSuccess = false;
 
-            // Set legend LEDs
+        if (airportString.length() == 0) {
+            // No real airports - just show legend/special codes
+            Serial.println("No real airports to fetch - showing legend only");
+            fetchSuccess = true;
+        } else {
+            // Fetch and process METARs
+            fetchSuccess = metarFetch(onMetarReceived);
+        }
+
+        if (fetchSuccess) {
+            if (airportString.length() > 0) {
+                Serial.printf("Successfully fetched %d METARs\n", metarGetLastCount());
+            }
+
+            // Set legend LEDs (and LTNG for lightning test)
             ledsSetLegend();
             ledsShow();
 
