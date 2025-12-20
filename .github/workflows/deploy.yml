@@ -56,6 +56,24 @@ jobs:
             rm -f web/dist/firmware/led-sectional.bin
           fi
 
+      - name: Update manifest version from release tag
+        run: |
+          # Get the latest release tag (e.g., "v2.0.1" -> "2.0.1")
+          RELEASE_TAG=$(gh release view --json tagName -q '.tagName' 2>/dev/null || echo "")
+          if [ -n "$RELEASE_TAG" ]; then
+            VERSION="${RELEASE_TAG#v}"  # Strip leading 'v'
+            echo "Updating manifest.json version to $VERSION"
+            # Update the version in manifest.json
+            if [ -f web/dist/firmware/manifest.json ]; then
+              sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"$VERSION\"/" web/dist/firmware/manifest.json
+              cat web/dist/firmware/manifest.json
+            fi
+          else
+            echo "Warning: Could not determine release version"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Update docs/configure
         run: |
           # Remove old configure files (except .gitkeep if any)

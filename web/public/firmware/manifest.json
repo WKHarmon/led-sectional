@@ -1,6 +1,6 @@
 {
   "name": "LED Sectional",
-  "version": "2.0.1",
+  "version": "dev",
   "home_assistant_domain": "esphome",
   "new_install_prompt_erase": true,
   "builds": [
