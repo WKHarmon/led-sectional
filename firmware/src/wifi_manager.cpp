@@ -145,5 +145,6 @@ bool wifiHasSavedCredentials() {
     // This works even before WiFiManager is initialized
     station_config conf;
     wifi_station_get_config_default(&conf);
-    return strlen(reinterpret_cast<char*>(conf.ssid)) > 0;
+    // Check first byte directly to avoid buffer overrun with non-null-terminated SSIDs
+    return conf.ssid[0] != 0;
 }

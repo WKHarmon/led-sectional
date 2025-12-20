@@ -25,7 +25,6 @@
 
 // State tracking
 static unsigned long lastMetarFetch = 0;
-static unsigned long lastLoopTime = 0;
 static bool initialFetchDone = false;
 static bool ledStatusShown = false;
 
@@ -221,26 +220,12 @@ void loop() {
         Serial.println("----------------------------------------");
     }
 
-    // Loop delay - but keep processing serial commands during the wait
-    unsigned long loopDelay;
-    if (config.doLightning && ledsHasLightning()) {
-        // Shorter delay for lightning animation
-        loopDelay = config.loopInterval;
-    } else if (lightSensorIsEnabled()) {
-        // Shorter delay for light sensor updates
-        loopDelay = config.loopInterval;
-    } else {
-        // Normal delay
-        loopDelay = config.loopInterval;
-    }
-
     // Wait for next loop iteration, but keep processing serial commands
     // This prevents serial buffer overflow during long delays
     unsigned long waitStart = millis();
-    while (millis() - waitStart < loopDelay && millis() - lastLoopTime < loopDelay) {
+    while (millis() - waitStart < config.loopInterval) {
         serialCmdProcess();  // Keep draining serial buffer
         delay(10);  // Small delay to prevent tight loop
         yield();
     }
-    lastLoopTime = millis();
 }

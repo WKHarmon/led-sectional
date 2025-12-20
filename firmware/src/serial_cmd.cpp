@@ -129,6 +129,18 @@ static void processCommand(const String& cmdJson) {
             if (cfg["loopInterval"].is<unsigned long>()) config.loopInterval = cfg["loopInterval"];
             if (cfg["dataPin"].is<int>()) config.dataPin = cfg["dataPin"];
 
+            // Validate and clamp config values
+            if (config.brightness < 0) config.brightness = 0;
+            if (config.brightness > 255) config.brightness = 255;
+            if (config.windThreshold < 0) config.windThreshold = 0;
+            if (config.windThreshold > 100) config.windThreshold = 100;
+            if (config.requestInterval < 60000) config.requestInterval = 60000;  // Min 1 minute
+            if (config.dataPin != 5 && config.dataPin != 14) config.dataPin = 14;  // Only GPIO 5 or 14 supported
+            if (config.minBrightness < 0) config.minBrightness = 0;
+            if (config.minBrightness > 255) config.minBrightness = 255;
+            if (config.maxBrightness < 0) config.maxBrightness = 0;
+            if (config.maxBrightness > 255) config.maxBrightness = 255;
+
             // Handle airports array
             bool airportsChanged = false;
             JsonArray airports = cfg["airports"];
@@ -228,6 +240,7 @@ void serialCmdProcess() {
             if (serialBuffer.length() > 0) {
                 processCommand(serialBuffer);
                 serialBuffer = "";
+                lastSerialDataTime = 0;  // Reset timeout tracking after successful command
             }
         } else {
             // Add to buffer

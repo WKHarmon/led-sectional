@@ -91,7 +91,7 @@ uint8_t lightSensorAdjustBrightness() {
     Serial.printf("Light reading: %.1f", reading);
 
     if (reading <= config.minLight) {
-        brightness = 0;  // Turn off in very dark conditions
+        brightness = config.minBrightness;  // Use minimum brightness in dark conditions
     } else if (reading >= config.maxLight) {
         brightness = config.maxBrightness;
     } else {

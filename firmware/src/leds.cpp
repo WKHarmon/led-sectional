@@ -9,8 +9,8 @@ static int numLeds = 0;
 // Lightning LEDs list
 static std::vector<int> lightningLeds;
 
-// Store original colors for lightning flash restore
-static std::vector<CRGB> lightningOriginalColors;
+// Store original colors for lightning flash restore (fixed-size to avoid heap fragmentation)
+static CRGB lightningOriginalColors[MAX_LEDS];
 
 void ledsInit() {
     Config& config = getConfig();
@@ -21,21 +21,32 @@ void ledsInit() {
         Serial.printf("Warning: Capping LEDs at %d (configured %d)\n", MAX_LEDS, config.airports.size());
     }
 
-    // Initialize FastLED
-    // Note: We use a template with compile-time pin, so we default to pin 14
-    // For runtime pin configuration, we'd need a different approach
-    FastLED.addLeds<WS2811, 14, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
+    // Initialize FastLED with appropriate pin based on configuration
+    // GPIO 5 (D1) for old kits, GPIO 14 (D5) for new kits
+    if (config.dataPin == 5) {
+        FastLED.addLeds<WS2811, 5, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
+    } else {
+        // Default to GPIO 14 for new kits
+        FastLED.addLeds<WS2811, 14, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
+    }
     FastLED.setBrightness(config.brightness);
 
-    Serial.printf("LEDs initialized: %d LEDs at brightness %d\n", numLeds, config.brightness);
+    Serial.printf("LEDs initialized: %d LEDs on GPIO %d at brightness %d\n",
+                  numLeds, config.dataPin, config.brightness);
 }
 
 void ledsUpdateCount(int count) {
+    Config& config = getConfig();
     if (count > MAX_LEDS) {
         count = MAX_LEDS;
     }
     numLeds = count;
-    FastLED.addLeds<WS2811, 14, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
+    // Re-initialize with appropriate pin
+    if (config.dataPin == 5) {
+        FastLED.addLeds<WS2811, 5, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
+    } else {
+        FastLED.addLeds<WS2811, 14, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
+    }
 }
 
 CRGB ledsGetCategoryColor(const String& category, int windSpeed, int gusts) {
@@ -116,10 +127,9 @@ bool ledsDoLightning() {
     Config& config = getConfig();
     if (!config.doLightning) return false;
 
-    // Store original colors
-    lightningOriginalColors.clear();
+    // Store original colors at matching indices, then set to lightning color
     for (int index : lightningLeds) {
-        lightningOriginalColors.push_back(leds[index]);
+        lightningOriginalColors[index] = leds[index];
         leds[index] = COLOR_LIGHTNING;
     }
 
@@ -127,9 +137,9 @@ bool ledsDoLightning() {
     FastLED.show();
     delay(25);
 
-    // Restore original colors
-    for (size_t i = 0; i < lightningLeds.size(); i++) {
-        leds[lightningLeds[i]] = lightningOriginalColors[i];
+    // Restore original colors from matching indices
+    for (int index : lightningLeds) {
+        leds[index] = lightningOriginalColors[index];
     }
     FastLED.show();
 
