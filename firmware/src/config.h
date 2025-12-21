@@ -41,7 +41,7 @@
 #define DEFAULT_POWER_ON true
 
 // WiFi reset button
-#define WIFI_RESET_PIN 0  // GPIO0 (FLASH button on most boards)
+#define WIFI_RESET_PIN 12  // GPIO12 (D6 on D1 Mini)
 
 // Light sensor type enumeration
 enum LightSensorType {

@@ -68,11 +68,14 @@ function App() {
     // If nothing saved, we already have DEFAULT_CONFIG from initial state
   }, []);
 
-  // Auto-navigate to WiFi tab when device needs WiFi configuration
+  // Track if we've auto-navigated to WiFi tab for this connection
+  const hasAutoNavigatedToWifiRef = useRef(false);
+
+  // Auto-navigate to WiFi tab when device needs WiFi configuration (only once per connection)
   useEffect(() => {
-    console.log('[WiFi Check] isConnected:', isConnected, 'needs_wifi_config:', status?.needs_wifi_config);
-    if (isConnected && status?.needs_wifi_config === true) {
-      console.log('[WiFi Check] Navigating to WiFi tab');
+    if (isConnected && status?.needs_wifi_config === true && !hasAutoNavigatedToWifiRef.current) {
+      console.log('[WiFi Check] Navigating to WiFi tab (first time)');
+      hasAutoNavigatedToWifiRef.current = true;
       setActiveTab('wifi');
     }
   }, [isConnected, status]);
@@ -94,10 +97,11 @@ function App() {
   // Track if we've done the initial sync for this connection
   const hasSyncedRef = useRef(false);
 
-  // Reset sync flag when disconnected
+  // Reset sync flags when disconnected
   useEffect(() => {
     if (!isConnected) {
       hasSyncedRef.current = false;
+      hasAutoNavigatedToWifiRef.current = false;
       setSavedLocalAirports(null);
     }
   }, [isConnected]);

@@ -6,16 +6,26 @@ interface LegacyImportProps {
 
 /**
  * Parses legacy C++ airport configuration format
- * Handles: std::vector<String> airports({"LIFR", "IFR", ...});
- * Or just: {"LIFR", "IFR", ...}
+ * Handles:
+ * - Full .ino file with std::vector<String> airports({...});
+ * - Just the vector: std::vector<String> airports({"LIFR", "IFR", ...});
+ * - Just the array content: {"LIFR", "IFR", ...}
  * Also handles comments like: "KMRY", // 8
  */
 function parseLegacyAirports(input: string): string[] {
-  // First, try to extract content between curly braces
-  const braceMatch = input.match(/\{([^}]+)\}/s);
-  if (!braceMatch) return [];
+  let content: string;
 
-  const content = braceMatch[1];
+  // First, try to find the airports vector specifically (for full file paste)
+  // Match: std::vector<String> airports({ ... }); with nested braces
+  const airportsVectorMatch = input.match(/std::vector<String>\s+airports\s*\(\s*\{([\s\S]*?)\}\s*\)/);
+  if (airportsVectorMatch) {
+    content = airportsVectorMatch[1];
+  } else {
+    // Fall back to finding content between first pair of curly braces
+    const braceMatch = input.match(/\{([^}]+)\}/s);
+    if (!braceMatch) return [];
+    content = braceMatch[1];
+  }
 
   // Match quoted strings, handling comments
   const airports: string[] = [];
@@ -71,7 +81,7 @@ export function LegacyImport({ onImport }: LegacyImportProps) {
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-400 mb-2">
-          Paste your legacy airport configuration
+          Paste your legacy airport configuration (vector or entire .ino file)
         </label>
         <textarea
           value={input}
