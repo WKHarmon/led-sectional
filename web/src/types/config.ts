@@ -17,6 +17,8 @@ export interface DeviceConfig {
   windThreshold: number;
   doLightning: boolean;
   doWinds: boolean;
+  windAlternate: boolean;
+  windAlternateInterval: number;
   useLightSensor: boolean;
   lightSensorType: LightSensorType;
   minBrightness: number;
@@ -69,7 +71,7 @@ export interface SerialResponse {
 }
 
 // Special airport entries
-export const SPECIAL_ENTRIES = ['VFR', 'MVFR', 'IFR', 'LIFR', 'WVFR', 'NULL'] as const;
+export const SPECIAL_ENTRIES = ['VFR', 'MVFR', 'IFR', 'LIFR', 'WVFR', 'WBNK', 'NULL'] as const;
 export type SpecialEntry = typeof SPECIAL_ENTRIES[number];
 
 // Check if an airport code is a special entry
@@ -85,6 +87,7 @@ export function getCategoryColorClass(code: string): string {
     case 'IFR': return 'cat-ifr';
     case 'LIFR': return 'cat-lifr';
     case 'WVFR': return 'cat-wvfr';
+    case 'WBNK': return 'cat-wbnk';
     case 'NULL': return 'cat-null';
     default: return 'bg-gray-500';
   }
@@ -102,6 +105,8 @@ export const DEFAULT_CONFIG: DeviceConfig = {
   windThreshold: 25,
   doLightning: true,
   doWinds: true,
+  windAlternate: false,
+  windAlternateInterval: 2000,
   useLightSensor: false,
   lightSensorType: LightSensorType.None,
   minBrightness: 20,

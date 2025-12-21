@@ -240,6 +240,7 @@ The following special codes can be used in the airport list for testing and lege
 | `IFR` | Legend LED - shows IFR red |
 | `LIFR` | Legend LED - shows LIFR magenta |
 | `WVFR` | Legend LED - shows windy VFR yellow |
+| `WBNK` | Wind blink demo - alternates between VFR green and WVFR yellow (requires "Alternate Colors" setting) |
 | `NULL` | Placeholder - LED stays off |
 | `LTNG` | **Dev only** - Tests lightning animation (shows VFR green with periodic white flash) |
 

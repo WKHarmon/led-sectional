@@ -73,6 +73,19 @@ bool ledsDoLightning();
 // Check if there are any lightning LEDs
 bool ledsHasLightning();
 
+// Add an LED to the windy list for alternating animation
+void ledsAddWindy(int index, CRGB categoryColor);
+
+// Clear the windy list
+void ledsClearWindy();
+
+// Check if there are any windy LEDs
+bool ledsHasWindy();
+
+// Process wind alternation animation (call from main loop)
+// Alternates between category color and yellow every 2 seconds
+void ledsDoWindAlternate();
+
 // Set legend LEDs (VFR, MVFR, IFR, LIFR, WVFR indicators)
 void ledsSetLegend();
 

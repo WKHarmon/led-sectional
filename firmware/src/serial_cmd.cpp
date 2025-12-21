@@ -71,6 +71,8 @@ void serialCmdSendConfig() {
     cfg["windThreshold"] = config.windThreshold;
     cfg["doLightning"] = config.doLightning;
     cfg["doWinds"] = config.doWinds;
+    cfg["windAlternate"] = config.windAlternate;
+    cfg["windAlternateInterval"] = config.windAlternateInterval;
     cfg["useLightSensor"] = config.useLightSensor;
     cfg["lightSensorType"] = static_cast<int>(config.lightSensorType);
     cfg["minBrightness"] = config.minBrightness;
@@ -128,6 +130,8 @@ static void processCommand(const String& cmdJson) {
             if (cfg["windThreshold"].is<int>()) config.windThreshold = cfg["windThreshold"];
             if (cfg["doLightning"].is<bool>()) config.doLightning = cfg["doLightning"];
             if (cfg["doWinds"].is<bool>()) config.doWinds = cfg["doWinds"];
+            if (cfg["windAlternate"].is<bool>()) config.windAlternate = cfg["windAlternate"];
+            if (cfg["windAlternateInterval"].is<unsigned long>()) config.windAlternateInterval = cfg["windAlternateInterval"];
             if (cfg["useLightSensor"].is<bool>()) config.useLightSensor = cfg["useLightSensor"];
             if (cfg["lightSensorType"].is<int>()) config.lightSensorType = static_cast<LightSensorType>((int)cfg["lightSensorType"]);
             if (cfg["minBrightness"].is<int>()) config.minBrightness = cfg["minBrightness"];
@@ -181,6 +185,8 @@ static void processCommand(const String& cmdJson) {
             if (config.maxBrightness < 0) config.maxBrightness = 0;
             if (config.maxBrightness > 255) config.maxBrightness = 255;
             if (config.mqttPort < 1 || config.mqttPort > 65535) config.mqttPort = 1883;
+            if (config.windAlternateInterval < 1000) config.windAlternateInterval = 1000;  // Min 1 second
+            if (config.windAlternateInterval > 10000) config.windAlternateInterval = 10000;  // Max 10 seconds
 
             // Handle airports array
             bool airportsChanged = false;

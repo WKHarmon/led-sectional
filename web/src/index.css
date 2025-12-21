@@ -12,6 +12,7 @@ body {
 .cat-ifr { @apply bg-red-500; }
 .cat-lifr { @apply bg-fuchsia-500; }
 .cat-wvfr { @apply bg-yellow-400; }
+.cat-wbnk { background: linear-gradient(135deg, #22c55e 50%, #facc15 50%); } /* green/yellow split */
 .cat-null { @apply bg-gray-700; }
 
 /* LED indicator styling */

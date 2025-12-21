@@ -12,6 +12,15 @@ static std::vector<int> lightningLeds;
 // Store original colors for lightning flash restore (fixed-size to avoid heap fragmentation)
 static CRGB lightningOriginalColors[MAX_LEDS];
 
+// Windy LEDs: store index and category color for alternation
+struct WindyLed {
+    int index;
+    CRGB categoryColor;  // The non-yellow color to alternate with
+};
+static std::vector<WindyLed> windyLeds;
+static unsigned long windAlternateLastSwitch = 0;
+static bool windAlternateShowYellow = false;  // false = category color, true = yellow
+
 void ledsInit() {
     Config& config = getConfig();
     numLeds = config.airports.size();
@@ -42,8 +51,9 @@ void ledsUpdateCount(int count) {
     }
     numLeds = count;
 
-    // Clear lightning LEDs since indices may now be invalid
+    // Clear lightning and windy LEDs since indices may now be invalid
     lightningLeds.clear();
+    windyLeds.clear();
 
     // Re-initialize with appropriate pin
     if (config.dataPin == 5) {
@@ -76,8 +86,35 @@ CRGB ledsGetCategoryColor(const String& category, int windSpeed, int gusts) {
 void ledsSetFlightCategory(int index, const String& category, int windSpeed, int gusts) {
     if (index < 0 || index >= numLeds) return;
 
-    CRGB color = ledsGetCategoryColor(category, windSpeed, gusts);
-    leds[index] = color;
+    Config& config = getConfig();
+
+    // Check if this airport has high winds
+    bool isWindy = config.doWinds &&
+                   (windSpeed > config.windThreshold || gusts > config.windThreshold);
+
+    if (isWindy && config.windAlternate) {
+        // Wind alternation mode: get the pure category color (not yellow)
+        CRGB categoryColor;
+        if (category == "LIFR") {
+            categoryColor = COLOR_LIFR;
+        } else if (category == "IFR") {
+            categoryColor = COLOR_IFR;
+        } else if (category == "MVFR") {
+            categoryColor = COLOR_MVFR;
+        } else if (category == "VFR") {
+            categoryColor = COLOR_VFR;
+        } else {
+            categoryColor = COLOR_UNKNOWN;
+        }
+
+        // Set to category color initially, add to windy list for alternation
+        leds[index] = categoryColor;
+        ledsAddWindy(index, categoryColor);
+    } else {
+        // Normal mode: use ledsGetCategoryColor which returns yellow for windy VFR
+        CRGB color = ledsGetCategoryColor(category, windSpeed, gusts);
+        leds[index] = color;
+    }
 }
 
 void ledsSetColor(int index, CRGB color) {
@@ -192,11 +229,65 @@ void ledsSetLegend() {
             leds[i] = COLOR_LIFR;
         } else if (code == "WVFR") {
             leds[i] = COLOR_WVFR;
+        } else if (code == "WBNK") {
+            // Wind blink demo: alternates between VFR green and WVFR yellow
+            leds[i] = COLOR_VFR;
+            ledsAddWindy(i, COLOR_VFR);
         } else if (code == "LTNG") {
             // Test lightning: show VFR color and add to lightning list
             leds[i] = COLOR_VFR;
             ledsAddLightning(i);
         }
         // NULL entries remain at whatever color they were (usually black)
+    }
+}
+
+void ledsAddWindy(int index, CRGB categoryColor) {
+    if (index < 0 || index >= numLeds) return;
+
+    // Check if already in list
+    for (const WindyLed& wl : windyLeds) {
+        if (wl.index == index) return;
+    }
+
+    windyLeds.push_back({index, categoryColor});
+    Serial.printf("Windy LED added: %d\n", index);
+}
+
+void ledsClearWindy() {
+    windyLeds.clear();
+    windAlternateLastSwitch = 0;
+    windAlternateShowYellow = false;
+}
+
+bool ledsHasWindy() {
+    return !windyLeds.empty();
+}
+
+void ledsDoWindAlternate() {
+    if (windyLeds.empty()) return;
+
+    Config& config = getConfig();
+    if (!config.windAlternate) return;
+
+    unsigned long currentTime = millis();
+
+    // Check if it's time to switch
+    if (currentTime - windAlternateLastSwitch >= config.windAlternateInterval) {
+        windAlternateShowYellow = !windAlternateShowYellow;
+        windAlternateLastSwitch = currentTime;
+
+        // Update all windy LEDs
+        for (const WindyLed& wl : windyLeds) {
+            if (wl.index < 0 || wl.index >= numLeds) continue;
+
+            if (windAlternateShowYellow) {
+                leds[wl.index] = COLOR_WVFR;  // Yellow
+            } else {
+                leds[wl.index] = wl.categoryColor;  // Original category color
+            }
+        }
+
+        ledsRefresh();
     }
 }

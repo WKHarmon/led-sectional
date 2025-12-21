@@ -64,6 +64,7 @@ After installing firmware, the controller needs your WiFi credentials:
 **Special codes:**
 - `NULL` - Skip an LED (leave it off)
 - `VFR`, `MVFR`, `IFR`, `LIFR`, `WVFR` - Legend LEDs that always show that color
+- `WBNK` - Wind blink demo - alternates between green and yellow (requires "Alternate Colors" setting enabled)
 
 ### Step 4: Mount and Enjoy
 

@@ -140,5 +140,6 @@ pio device monitor -b 115200
 
 The firmware has special airport codes for testing:
 - `VFR`, `MVFR`, `IFR`, `LIFR`, `WVFR` - Legend LEDs (fixed colors)
+- `WBNK` - Wind blink demo (alternates green/yellow, requires "Alternate Colors" setting)
 - `NULL` - Skip LED (stays off)
 - `LTNG` - Test lightning animation

@@ -197,6 +197,11 @@ void loop() {
         ledsDoLightning();
     }
 
+    // Wind alternation animation (alternates between category color and yellow)
+    if (config.windAlternate && ledsHasWindy()) {
+        ledsDoWindAlternate();
+    }
+
     // Determine if we should fetch METARs
     bool shouldFetch = false;
 
@@ -218,8 +223,9 @@ void loop() {
 
         digitalWrite(LED_BUILTIN, LOW);  // LED on during fetch
 
-        // Clear lightning list and LEDs before fetch
+        // Clear lightning and windy lists, then clear LEDs before fetch
         ledsClearLightning();
+        ledsClearWindy();
         ledsClear();
 
         // Check if there are any real airports to fetch

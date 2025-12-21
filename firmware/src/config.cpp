@@ -147,6 +147,8 @@ String configToJson(const Config& config) {
     doc["windThreshold"] = config.windThreshold;
     doc["doLightning"] = config.doLightning;
     doc["doWinds"] = config.doWinds;
+    doc["windAlternate"] = config.windAlternate;
+    doc["windAlternateInterval"] = config.windAlternateInterval;
     doc["useLightSensor"] = config.useLightSensor;
     doc["lightSensorType"] = static_cast<int>(config.lightSensorType);
     doc["minBrightness"] = config.minBrightness;
@@ -190,6 +192,8 @@ bool configFromJson(const String& json, Config& config) {
     config.windThreshold = doc["windThreshold"] | DEFAULT_WIND_THRESHOLD;
     config.doLightning = doc["doLightning"] | DEFAULT_DO_LIGHTNING;
     config.doWinds = doc["doWinds"] | DEFAULT_DO_WINDS;
+    config.windAlternate = doc["windAlternate"] | DEFAULT_WIND_ALTERNATE;
+    config.windAlternateInterval = doc["windAlternateInterval"] | DEFAULT_WIND_ALTERNATE_INTERVAL;
     config.useLightSensor = doc["useLightSensor"] | DEFAULT_USE_LIGHT_SENSOR;
     config.lightSensorType = static_cast<LightSensorType>(doc["lightSensorType"] | 0);
     config.minBrightness = doc["minBrightness"] | DEFAULT_MIN_BRIGHTNESS;

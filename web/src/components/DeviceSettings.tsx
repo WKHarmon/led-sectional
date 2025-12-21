@@ -32,6 +32,8 @@ export function DeviceSettings({
       windThreshold: config.windThreshold,
       doLightning: config.doLightning,
       doWinds: config.doWinds,
+      windAlternate: config.windAlternate,
+      windAlternateInterval: config.windAlternateInterval,
       useLightSensor: config.useLightSensor,
       lightSensorType: config.lightSensorType,
       minBrightness: config.minBrightness,
@@ -142,23 +144,69 @@ export function DeviceSettings({
           </div>
 
           {localConfig.doWinds && (
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
-                Wind Threshold ({localConfig.windThreshold} knots)
-              </label>
-              <input
-                type="range"
-                min="10"
-                max="50"
-                value={localConfig.windThreshold || 25}
-                onChange={(e) => updateConfig('windThreshold', parseInt(e.target.value))}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>10 kt</span>
-                <span>50 kt</span>
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">
+                  Wind Threshold ({localConfig.windThreshold} knots)
+                </label>
+                <input
+                  type="range"
+                  min="10"
+                  max="50"
+                  value={localConfig.windThreshold || 25}
+                  onChange={(e) => updateConfig('windThreshold', parseInt(e.target.value))}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>10 kt</span>
+                  <span>50 kt</span>
+                </div>
               </div>
-            </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="text-sm font-medium text-gray-400">
+                    Alternate Colors
+                  </label>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Blink between flight category and yellow
+                  </p>
+                </div>
+                <button
+                  onClick={() => updateConfig('windAlternate', !localConfig.windAlternate)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    localConfig.windAlternate ? 'bg-blue-600' : 'bg-gray-600'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      localConfig.windAlternate ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {localConfig.windAlternate && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">
+                    Blink Interval ({(localConfig.windAlternateInterval || 2000) / 1000} seconds)
+                  </label>
+                  <input
+                    type="range"
+                    min="1000"
+                    max="10000"
+                    step="1000"
+                    value={localConfig.windAlternateInterval || 2000}
+                    onChange={(e) => updateConfig('windAlternateInterval', parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>1 sec</span>
+                    <span>10 sec</span>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

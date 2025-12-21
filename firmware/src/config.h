@@ -24,6 +24,8 @@
 #define DEFAULT_WIND_THRESHOLD 25
 #define DEFAULT_DO_LIGHTNING true
 #define DEFAULT_DO_WINDS true
+#define DEFAULT_WIND_ALTERNATE false
+#define DEFAULT_WIND_ALTERNATE_INTERVAL 2000  // milliseconds (1-10 seconds)
 
 // Light sensor defaults
 #define DEFAULT_USE_LIGHT_SENSOR false
@@ -71,6 +73,8 @@ struct Config {
     int windThreshold;
     bool doLightning;
     bool doWinds;
+    bool windAlternate;  // Alternate between category color and yellow for windy airports
+    unsigned long windAlternateInterval;  // Milliseconds between color switches (1000-10000)
 
     // Light sensor settings
     bool useLightSensor;
@@ -102,6 +106,8 @@ struct Config {
         windThreshold = DEFAULT_WIND_THRESHOLD;
         doLightning = DEFAULT_DO_LIGHTNING;
         doWinds = DEFAULT_DO_WINDS;
+        windAlternate = DEFAULT_WIND_ALTERNATE;
+        windAlternateInterval = DEFAULT_WIND_ALTERNATE_INTERVAL;
         useLightSensor = DEFAULT_USE_LIGHT_SENSOR;
         lightSensorType = LIGHT_SENSOR_NONE;
         minBrightness = DEFAULT_MIN_BRIGHTNESS;
