@@ -2,6 +2,9 @@
 #define LEDS_H
 
 #include <Arduino.h>
+
+// ESP8266 timing fix: disable interrupt retry to reduce first-LED corruption
+#define FASTLED_INTERRUPT_RETRY_COUNT 0
 #include <FastLED.h>
 
 // Maximum number of LEDs supported
@@ -39,8 +42,11 @@ void ledsSetAll(CRGB color);
 // Clear all LEDs
 void ledsClear();
 
-// Show the current LED state
+// Show the current LED state (with ESP8266 timing workarounds)
 void ledsShow();
+
+// Simple refresh - call every loop to correct timing glitches
+void ledsRefresh();
 
 // Set brightness (0-255)
 void ledsSetBrightness(uint8_t brightness);

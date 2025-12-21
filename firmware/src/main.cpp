@@ -260,6 +260,9 @@ void loop() {
         Serial.println("----------------------------------------");
     }
 
+    // Refresh LEDs every loop to correct any timing glitches
+    ledsRefresh();
+
     // Wait for next loop iteration, but keep processing serial and MQTT
     // This prevents serial buffer overflow during long delays
     unsigned long waitStart = millis();
