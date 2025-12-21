@@ -3,8 +3,6 @@
 
 #include <Arduino.h>
 
-// ESP8266 timing fix: disable interrupt retry to reduce first-LED corruption
-#define FASTLED_INTERRUPT_RETRY_COUNT 0
 #include <FastLED.h>
 
 // Maximum number of LEDs supported

@@ -18,7 +18,7 @@ The LED Sectional automatically fetches current weather data (METARs) from aviat
 | White Flash | Thunderstorms reported |
 | Off | No data available |
 
-Weather updates automatically every 5 minutes.
+Weather updates automatically every 15 minutes.
 
 ## What You Need
 

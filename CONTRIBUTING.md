@@ -66,25 +66,38 @@ pio run -t uploadfs
 
 ### Platform and Dependencies
 
-The firmware uses specific pinned versions for compatibility:
+The firmware uses specific pinned versions for compatibility. These versions have been carefully tested together.
 
-**Platform:** `espressif8266@2.6.3`
-- Newer versions (3.0+) have WiFi interrupt conflicts with FastLED timing that cause only the first LED to light up
-- This version uses Arduino ESP8266 core 2.7.4
+**Platform:** `espressif8266@2.6.3` (Arduino ESP8266 Core 2.7.4)
+
+This older platform version is required because:
+- Arduino Core 3.x changed NMI (Non-Maskable Interrupt) handling in ways that conflict with FastLED's timing-critical WS2812 protocol
+- Core 3.x causes first-LED flickering/corruption even with various workarounds (`FASTLED_ALLOW_INTERRUPTS`, `FASTLED_INTERRUPT_RETRY_COUNT`, double `show()` calls, etc.)
+- Core 2.7.4 has stable interrupt handling that works reliably with FastLED
 
 **Libraries** (PlatformIO manages these automatically):
 
 | Library | Version | Notes |
 |---------|---------|-------|
-| FastLED | 3.6.0 (pinned) | 3.10+ requires C++ features not in older toolchain |
-| WiFiManager | ^2.0.17 | |
-| JsonStreamingParser | ^1.0.5 | |
-| ArduinoJson | ^7.4.2 | |
+| FastLED | 3.7.6 (pinned) | Last version compatible with Core 2.7.4's GCC 4.8.2 toolchain. Version 3.7.7+ uses C++17 `static_assert` without message; 3.9+ uses structured bindings; 3.10+ uses `constexpr` in `alignas()` |
+| WiFiManager | 2.0.16-rc.2 (pinned) | Version 2.0.17 crashes in AP mode on Core 2.7.4 (unaligned flash access in `getMenuOut()`). Installed via GitHub URL |
+| ArduinoJson | ^7.4.2 | JSON parsing for configuration and serial commands |
+| JsonStreamingParser | ^1.0.5 | Memory-efficient streaming parser for METAR data |
 | PubSubClient | ^2.8 | MQTT client for Home Assistant integration |
 | Adafruit TSL2561 | ^1.1.2 | Optional light sensor |
 | Adafruit Unified Sensor | ^1.1.15 | Required by TSL2561 |
 
-For Arduino IDE, install the equivalent versions via Library Manager.
+**Why not just upgrade everything?**
+
+We tested systematically and found:
+- FastLED 3.7.7-3.7.8: Fail with `static_assert` missing second parameter (C++17 feature)
+- FastLED 3.9.x: Fail with structured bindings `for (auto [a, b] : ...)` (C++17 feature)
+- FastLED 3.10.x: Fail with `constexpr` values in `alignas()` (GCC 4.8.2 limitation)
+- WiFiManager 2.0.17: Crashes when client connects in AP mode on Core 2.7.4
+
+The GCC 4.8.2 toolchain in Core 2.7.4 only supports C++11, so libraries using C++17 features won't compile.
+
+For Arduino IDE, install the equivalent versions via Library Manager (you may need to manually download WiFiManager 2.0.16-rc.2 from GitHub).
 
 ## Building the Web App
 
@@ -133,7 +146,7 @@ The web app is deployed automatically via GitHub Actions:
 | TSL2561 SDA | GPIO 4 (D2) | Optional light sensor |
 | TSL2561 SCL | GPIO 5 (D1) | Optional light sensor |
 | Analog Light Sensor | A0 | Alternative to TSL2561 |
-| Reset Button | GPIO 0 (D3/FLASH) | Hold 3 seconds to reset WiFi |
+| Reset Button | GPIO 12 (D6) | Hold 3 seconds to reset WiFi |
 
 ## Serial Command Interface
 
