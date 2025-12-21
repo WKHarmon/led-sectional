@@ -29,6 +29,9 @@ bool wifiInit() {
     wm.setConfigPortalTimeout(WIFI_PORTAL_TIMEOUT);
     wm.setConnectTimeout(DEFAULT_WIFI_TIMEOUT);
 
+    // Reset timeout when web client connects - helps with iOS captive portal
+    wm.setWebPortalClientCheck(true);
+
     // Set custom hostname
     String hostname = "LED-Sectional-" + String(ESP.getChipId(), HEX);
     WiFi.hostname(hostname);

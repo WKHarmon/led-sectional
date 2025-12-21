@@ -90,6 +90,11 @@ void ledsClear() {
 }
 
 void ledsShow() {
+    // ESP8266/FastLED compatibility fixes:
+    // 1. Delay before show() to allow LED data to settle
+    // 2. Call show() twice for reliable output on ESP8266 with Arduino Core 3.x
+    FastLED.delay(20);
+    FastLED.show();
     FastLED.show();
 }
 
@@ -110,6 +115,8 @@ void ledsSetPower(bool on) {
         // Turn off by setting brightness to 0
         FastLED.setBrightness(0);
     }
+    FastLED.delay(20);
+    FastLED.show();
     FastLED.show();
 }
 
@@ -151,6 +158,8 @@ bool ledsDoLightning() {
     }
 
     // Show white flash
+    FastLED.delay(20);
+    FastLED.show();
     FastLED.show();
     delay(25);
 
@@ -158,6 +167,8 @@ bool ledsDoLightning() {
     for (int index : lightningLeds) {
         leds[index] = lightningOriginalColors[index];
     }
+    FastLED.delay(20);
+    FastLED.show();
     FastLED.show();
 
     return true;
