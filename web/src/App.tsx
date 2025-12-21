@@ -25,12 +25,22 @@ function compareVersions(a: string, b: string): number {
   if (a === 'dev') return -1;
   if (b === 'dev') return 1;
 
-  const aParts = a.split('.').map(Number);
-  const bParts = b.split('.').map(Number);
+  // Strip pre-release suffixes (e.g., "1.0.0-rc1" -> "1.0.0")
+  const aBase = a.split('-')[0];
+  const bBase = b.split('-')[0];
+
+  const aParts = aBase.split('.').map(p => {
+    const num = parseInt(p, 10);
+    return isNaN(num) ? 0 : num;
+  });
+  const bParts = bBase.split('.').map(p => {
+    const num = parseInt(p, 10);
+    return isNaN(num) ? 0 : num;
+  });
 
   for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
-    const aVal = aParts[i] || 0;
-    const bVal = bParts[i] || 0;
+    const aVal = aParts[i] ?? 0;
+    const bVal = bParts[i] ?? 0;
     if (aVal < bVal) return -1;
     if (aVal > bVal) return 1;
   }

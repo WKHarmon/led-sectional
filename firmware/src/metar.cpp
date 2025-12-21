@@ -48,16 +48,21 @@ void metarInit() {
 
 String metarBuildAirportString() {
     Config& config = getConfig();
-    String airportString = "";
-    bool first = true;
 
+    // Pre-allocate to avoid O(n²) string concatenation
+    // Each airport is ~5 chars (4 + comma), reserve for all airports
+    String airportString;
+    airportString.reserve(config.airports.size() * 6);
+
+    bool first = true;
     for (const String& airport : config.airports) {
         if (!isSpecialCode(airport)) {
             if (first) {
                 first = false;
                 airportString = airport;
             } else {
-                airportString += "," + airport;
+                airportString += ',';
+                airportString += airport;
             }
         }
     }
@@ -158,6 +163,8 @@ bool metarFetch(MetarProcessCallback callback) {
     parser.setListener(&listener);
 
     // Parse response body character by character
+    // Limit response size to prevent memory exhaustion from malformed responses
+    static const int MAX_RESPONSE_SIZE = 150000;  // ~150KB max
     Serial.print("Parsing response");
     timeout = millis();
     int charCount = 0;
@@ -168,6 +175,12 @@ bool metarFetch(MetarProcessCallback callback) {
             parser.parse(c);
             charCount++;
             timeout = millis();  // Reset timeout on data received
+
+            // Abort if response is too large
+            if (charCount > MAX_RESPONSE_SIZE) {
+                Serial.println(" response too large, aborting");
+                break;
+            }
         } else if (millis() - timeout > DEFAULT_READ_TIMEOUT * 1000) {
             Serial.println(" timeout");
             break;

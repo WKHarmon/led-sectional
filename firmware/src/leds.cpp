@@ -41,6 +41,10 @@ void ledsUpdateCount(int count) {
         count = MAX_LEDS;
     }
     numLeds = count;
+
+    // Clear lightning LEDs since indices may now be invalid
+    lightningLeds.clear();
+
     // Re-initialize with appropriate pin
     if (config.dataPin == 5) {
         FastLED.addLeds<WS2811, 5, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
@@ -150,6 +154,8 @@ bool ledsDoLightning() {
 
     // Store original colors at matching indices, then set to lightning color
     for (int index : lightningLeds) {
+        // Bounds check in case LED count changed
+        if (index < 0 || index >= numLeds) continue;
         lightningOriginalColors[index] = leds[index];
         leds[index] = COLOR_LIGHTNING;
     }
@@ -160,6 +166,8 @@ bool ledsDoLightning() {
 
     // Restore original colors from matching indices
     for (int index : lightningLeds) {
+        // Bounds check in case LED count changed
+        if (index < 0 || index >= numLeds) continue;
         leds[index] = lightningOriginalColors[index];
     }
     ledsRefresh();

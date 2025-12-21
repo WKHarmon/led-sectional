@@ -134,8 +134,12 @@ static void processCommand(const String& cmdJson) {
             if (cfg["maxBrightness"].is<int>()) config.maxBrightness = cfg["maxBrightness"];
             if (cfg["minLight"].is<int>()) config.minLight = cfg["minLight"];
             if (cfg["maxLight"].is<int>()) config.maxLight = cfg["maxLight"];
-            if (cfg["requestInterval"].is<unsigned long>()) config.requestInterval = cfg["requestInterval"];
-            if (cfg["loopInterval"].is<unsigned long>()) config.loopInterval = cfg["loopInterval"];
+            if (cfg["requestInterval"].is<unsigned long>()) {
+                config.requestInterval = cfg["requestInterval"];
+            }
+            if (cfg["loopInterval"].is<unsigned long>()) {
+                config.loopInterval = cfg["loopInterval"];
+            }
             if (cfg["dataPin"].is<int>()) config.dataPin = cfg["dataPin"];
 
             // MQTT settings
@@ -168,6 +172,9 @@ static void processCommand(const String& cmdJson) {
             if (config.windThreshold < 0) config.windThreshold = 0;
             if (config.windThreshold > 100) config.windThreshold = 100;
             if (config.requestInterval < 60000) config.requestInterval = 60000;  // Min 1 minute
+            if (config.requestInterval > 3600000) config.requestInterval = 3600000;  // Max 1 hour
+            if (config.loopInterval < 50) config.loopInterval = 50;  // Min 50ms
+            if (config.loopInterval > 60000) config.loopInterval = 60000;  // Max 1 minute
             if (config.dataPin != 5 && config.dataPin != 14) config.dataPin = 14;  // Only GPIO 5 or 14 supported
             if (config.minBrightness < 0) config.minBrightness = 0;
             if (config.minBrightness > 255) config.minBrightness = 255;

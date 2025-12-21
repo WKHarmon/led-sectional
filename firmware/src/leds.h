@@ -6,7 +6,9 @@
 #include <FastLED.h>
 
 // Maximum number of LEDs supported
-#define MAX_LEDS 200
+// Limited by URL length for METAR API requests (~400 airports max)
+// and ESP8266 RAM (6 bytes per LED for arrays)
+#define MAX_LEDS 300
 
 // Flight category colors
 #define COLOR_VFR     CRGB::Green

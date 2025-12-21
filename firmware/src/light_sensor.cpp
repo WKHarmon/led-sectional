@@ -96,7 +96,10 @@ uint8_t lightSensorAdjustBrightness() {
         brightness = config.maxBrightness;
     } else {
         // Linear interpolation between min and max
-        float percent = (reading - config.minLight) / (float)(config.maxLight - config.minLight);
+        // Guard against division by zero if minLight == maxLight
+        float range = (float)(config.maxLight - config.minLight);
+        if (range <= 0) range = 1.0f;
+        float percent = (reading - config.minLight) / range;
         brightness = percent * (config.maxBrightness - config.minBrightness) + config.minBrightness;
     }
 

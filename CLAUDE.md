@@ -30,7 +30,9 @@ The firmware requires specific library versions due to ESP8266 platform limitati
 | espressif8266 | 2.6.3 | Arduino Core 2.7.4 - stable interrupt handling for WS2812 timing |
 | FastLED | 3.7.6 | Last version compatible with GCC 4.8.2 (C++11 only) |
 | WiFiManager | 2.0.16-rc.2 | 2.0.17 crashes in AP mode on Core 2.7.4 |
-| ArduinoJson | ^7.4.2 | Works fine, no constraint |
+| ArduinoJson | 7.4.2 | Pinned for reproducible builds |
+| JsonStreamingParser | 1.0.5 | Pinned for reproducible builds |
+| PubSubClient | 2.8.0 | Pinned for reproducible builds |
 
 **Why Arduino Core 2.7.4?**
 - Core 3.x changed NMI handling, causing first-LED flickering with FastLED
@@ -105,10 +107,12 @@ The CI will:
 
 - `firmware/platformio.ini` - Library versions and build config
 - `firmware/src/config.h` - Hardware pin definitions and defaults
+- `firmware/src/leds.h` - LED constants including MAX_LEDS (300)
 - `firmware/src/leds.cpp` - FastLED integration
 - `firmware/src/wifi_manager.cpp` - WiFiManager integration
 - `firmware/src/metar.cpp` - METAR fetching and parsing
 - `web/src/App.tsx` - Main web app component
+- `web/src/components/AirportConfig.tsx` - Airport config with MAX_AIRPORTS validation
 
 ## Debugging
 

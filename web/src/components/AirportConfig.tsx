@@ -3,6 +3,9 @@ import { AirportList } from './AirportList';
 import { LegacyImport } from './LegacyImport';
 import type { DeviceConfig } from '../types/config';
 
+// Maximum airports supported by firmware (must match MAX_LEDS in leds.h)
+const MAX_AIRPORTS = 300;
+
 interface AirportConfigProps {
   config: DeviceConfig;
   onSave: (config: Partial<DeviceConfig>) => Promise<boolean>;
@@ -36,9 +39,15 @@ export function AirportConfig({
     JSON.stringify(localAirports) !== JSON.stringify(syncedAirports);
 
   const handleChange = (newAirports: string[]) => {
+    // Enforce maximum airport limit
+    if (newAirports.length > MAX_AIRPORTS) {
+      newAirports = newAirports.slice(0, MAX_AIRPORTS);
+    }
     setAirports(newAirports);
     setHasChanges(true);
   };
+
+  const isAtLimit = airports.length >= MAX_AIRPORTS;
 
   const handleImport = (importedAirports: string[]) => {
     setAirports(importedAirports);
@@ -106,13 +115,24 @@ export function AirportConfig({
 
       {/* Quick add buttons */}
       <div className="bg-gray-800 rounded-lg p-4">
-        <h4 className="text-sm font-medium text-gray-400 mb-3">Quick Add</h4>
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-sm font-medium text-gray-400">Quick Add</h4>
+          <span className={`text-xs ${isAtLimit ? 'text-yellow-500' : 'text-gray-500'}`}>
+            {airports.length} / {MAX_AIRPORTS} airports
+          </span>
+        </div>
+        {isAtLimit && (
+          <div className="mb-3 text-yellow-500 text-sm">
+            Maximum of {MAX_AIRPORTS} airports reached. Remove some to add more.
+          </div>
+        )}
         <div className="flex flex-wrap gap-2">
           {['VFR', 'MVFR', 'IFR', 'LIFR', 'WVFR', 'NULL'].map((code) => (
             <button
               key={code}
               onClick={() => handleChange([...airports, code])}
-              className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm font-mono"
+              disabled={isAtLimit}
+              className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm font-mono disabled:opacity-50 disabled:cursor-not-allowed"
             >
               + {code}
             </button>

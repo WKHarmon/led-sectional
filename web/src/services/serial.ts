@@ -12,11 +12,18 @@ export interface SerialConnection {
 
 export type SerialLogCallback = (message: string, type: 'tx' | 'rx' | 'info' | 'error') => void;
 
+// Response queue item for handling multiple pending commands
+interface PendingResponse {
+  resolver: (value: string) => void;
+  rejecter: (error: Error) => void;
+  timeout: ReturnType<typeof setTimeout>;
+}
+
 class SerialService {
   private connection: SerialConnection | null = null;
   private logCallback: SerialLogCallback | null = null;
   private responseBuffer = '';
-  private responseResolver: ((value: string) => void) | null = null;
+  private responseQueue: PendingResponse[] = [];  // Queue instead of single resolver
   private readLoopPromise: Promise<void> | null = null;
   private isReading = false;
 
@@ -176,9 +183,11 @@ class SerialService {
         this.log(line, 'rx');
 
         // Check if it's a JSON response we're waiting for
-        if (this.responseResolver && line.startsWith('{')) {
-          this.responseResolver(line);
-          this.responseResolver = null;
+        // Use queue to handle responses in order (FIFO)
+        if (this.responseQueue.length > 0 && line.startsWith('{')) {
+          const pending = this.responseQueue.shift()!;
+          clearTimeout(pending.timeout);
+          pending.resolver(line);
         }
       }
     }
@@ -211,22 +220,29 @@ class SerialService {
       }
     }
 
-    // Wait for response with timeout
+    // Wait for response with timeout using queue
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        this.responseResolver = null;
-        reject(new Error('Response timeout'));
-      }, RESPONSE_TIMEOUT);
-
-      this.responseResolver = (responseText: string) => {
-        clearTimeout(timeout);
-        try {
-          const response = JSON.parse(responseText) as SerialResponse;
-          resolve(response);
-        } catch {
-          reject(new Error('Invalid JSON response'));
-        }
+      const pending: PendingResponse = {
+        resolver: (responseText: string) => {
+          try {
+            const response = JSON.parse(responseText) as SerialResponse;
+            resolve(response);
+          } catch {
+            reject(new Error('Invalid JSON response'));
+          }
+        },
+        rejecter: reject,
+        timeout: setTimeout(() => {
+          // Remove this pending response from queue on timeout
+          const index = this.responseQueue.indexOf(pending);
+          if (index !== -1) {
+            this.responseQueue.splice(index, 1);
+          }
+          reject(new Error('Response timeout'));
+        }, RESPONSE_TIMEOUT),
       };
+
+      this.responseQueue.push(pending);
     });
   }
 
