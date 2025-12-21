@@ -35,6 +35,7 @@ export interface DeviceConfig {
 // Device status from get_status command
 export interface DeviceStatus {
   status: string;
+  firmware_version: string;
   wifi_connected: boolean;
   wifi_ssid: string;
   ip_address: string;

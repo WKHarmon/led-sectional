@@ -17,16 +17,35 @@ import {
 import type { DeviceConfig } from './types/config';
 import { DEFAULT_CONFIG } from './types/config';
 
-type Tab = 'airports' | 'settings' | 'wifi' | 'monitor' | 'firmware';
+type Tab = 'firmware' | 'airports' | 'settings' | 'wifi' | 'monitor';
+
+// Compare semantic versions (returns -1, 0, or 1)
+function compareVersions(a: string, b: string): number {
+  // Handle "dev" as always needing update
+  if (a === 'dev') return -1;
+  if (b === 'dev') return 1;
+
+  const aParts = a.split('.').map(Number);
+  const bParts = b.split('.').map(Number);
+
+  for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+    const aVal = aParts[i] || 0;
+    const bVal = bParts[i] || 0;
+    if (aVal < bVal) return -1;
+    if (aVal > bVal) return 1;
+  }
+  return 0;
+}
 
 function App() {
-  const [activeTab, setActiveTab] = useState<Tab>('airports');
+  const [activeTab, setActiveTab] = useState<Tab>('firmware');
   const [offlineConfig, setOfflineConfig] = useState<DeviceConfig>(DEFAULT_CONFIG);
   const [savedLocalAirports, setSavedLocalAirports] = useState<string[] | null>(null); // Preserved local airports
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [pendingUploadConfig, setPendingUploadConfig] = useState<DeviceConfig | null>(null);
+  const [latestVersion, setLatestVersion] = useState<string | null>(null);
 
   const {
     isConnected,
@@ -68,8 +87,21 @@ function App() {
     // If nothing saved, we already have DEFAULT_CONFIG from initial state
   }, []);
 
-  // Track if we've auto-navigated to WiFi tab for this connection
+  // Fetch latest firmware version from manifest
+  useEffect(() => {
+    fetch('firmware/manifest.json')
+      .then(res => res.json())
+      .then(data => {
+        if (data.version && data.version !== 'dev') {
+          setLatestVersion(data.version);
+        }
+      })
+      .catch(err => console.warn('Could not fetch firmware manifest:', err));
+  }, []);
+
+  // Track if we've auto-navigated for this connection
   const hasAutoNavigatedToWifiRef = useRef(false);
+  const hasAutoNavigatedToAirportsRef = useRef(false);
 
   // Auto-navigate to WiFi tab when device needs WiFi configuration (only once per connection)
   useEffect(() => {
@@ -79,6 +111,25 @@ function App() {
       setActiveTab('wifi');
     }
   }, [isConnected, status]);
+
+  // Auto-navigate to Airports tab when firmware and WiFi are configured
+  // Triggers the first time we see needs_wifi_config=false (either on connect or after WiFi setup)
+  useEffect(() => {
+    if (isConnected && !hasAutoNavigatedToAirportsRef.current) {
+      // Check if WiFi is configured
+      const wifiConfigured = status?.needs_wifi_config === false;
+      // Check if firmware is up to date (or at least not "dev")
+      const firmwareOk = status?.firmware_version && latestVersion
+        ? compareVersions(status.firmware_version, latestVersion) >= 0
+        : status?.firmware_version && status.firmware_version !== 'dev';
+
+      if (wifiConfigured && firmwareOk) {
+        console.log('[Auto-navigate] Firmware and WiFi OK, navigating to Airports tab');
+        hasAutoNavigatedToAirportsRef.current = true;
+        setActiveTab('airports');
+      }
+    }
+  }, [isConnected, status, latestVersion]);
 
   // Periodically refresh status when connected to detect state changes (e.g., after WiFi configured)
   useEffect(() => {
@@ -102,6 +153,7 @@ function App() {
     if (!isConnected) {
       hasSyncedRef.current = false;
       hasAutoNavigatedToWifiRef.current = false;
+      hasAutoNavigatedToAirportsRef.current = false;
       setSavedLocalAirports(null);
     }
   }, [isConnected]);
@@ -241,12 +293,18 @@ function App() {
   // Check if device needs WiFi configuration
   const needsWifiConfig = isConnected && status?.needs_wifi_config === true;
 
-  const tabs: { id: Tab; label: string; icon: string; requiresDevice?: boolean; requiresWifi?: boolean }[] = [
-    { id: 'airports', label: 'Airports', icon: '✈️', requiresWifi: true },
+  // Firmware version comparison
+  const deviceVersion = status?.firmware_version;
+  const firmwareUpToDate = deviceVersion && latestVersion
+    ? compareVersions(deviceVersion, latestVersion) >= 0
+    : false;
+
+  const tabs: { id: Tab; label: string; icon: string; step?: number; requiresDevice?: boolean; requiresWifi?: boolean }[] = [
+    { id: 'firmware', label: 'Firmware', icon: '💾', step: 1 },
+    { id: 'wifi', label: 'WiFi', icon: '📶', step: 2, requiresDevice: true },
+    { id: 'airports', label: 'Airports', icon: '✈️', step: 3, requiresWifi: true },
     { id: 'settings', label: 'Settings', icon: '⚙️', requiresWifi: true },
-    { id: 'wifi', label: 'WiFi', icon: '📶', requiresDevice: true },
     { id: 'monitor', label: 'Monitor', icon: '📟', requiresDevice: true },
-    { id: 'firmware', label: 'Firmware', icon: '💾' },
   ];
 
   return (
@@ -354,6 +412,25 @@ function App() {
                     ? 'WiFi setup required'
                     : null;
 
+                // De-emphasize firmware tab when device is connected and up-to-date
+                const isDeemphasized = tab.id === 'firmware' && isConnected && firmwareUpToDate;
+
+                // Show checkmark for completed setup steps
+                // Airports checkmark: WiFi configured AND airports don't match the firmware test default
+                // The firmware ships with 50 test airports: LIFR,IFR,MVFR,WVFR,VFR,KSFO,NULL,NULL,...
+                const firmwareTestDefault = [
+                  'LIFR', 'IFR', 'MVFR', 'WVFR', 'VFR', 'KSFO',
+                  'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL'
+                ];
+                const hasConfiguredAirports = isConnected && !needsWifiConfig && deviceConfig &&
+                  deviceConfig.airports.length > 0 &&
+                  // Check if first 15 airports match the test default
+                  JSON.stringify(deviceConfig.airports.slice(0, 15)) !== JSON.stringify(firmwareTestDefault);
+
+                const showCheckmark = tab.id === 'firmware' && isConnected && firmwareUpToDate
+                  || tab.id === 'wifi' && isConnected && !needsWifiConfig
+                  || tab.id === 'airports' && hasConfiguredAirports;
+
                 return (
                   <button
                     key={tab.id}
@@ -364,13 +441,35 @@ function App() {
                         ? 'bg-blue-600 text-white'
                         : isDisabled
                           ? 'text-gray-600 cursor-not-allowed'
-                          : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                          : isDeemphasized
+                            ? 'text-gray-500 hover:text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
                     }`}
                   >
+                    {/* Step number badge */}
+                    {tab.step && (
+                      <span className={`w-5 h-5 rounded-full text-xs flex items-center justify-center font-medium ${
+                        showCheckmark
+                          ? 'bg-green-600 text-white'
+                          : activeTab === tab.id
+                            ? 'bg-blue-500 text-white'
+                            : isDisabled
+                              ? 'bg-gray-700 text-gray-600'
+                              : 'bg-gray-700 text-gray-400'
+                      }`}>
+                        {showCheckmark ? '✓' : tab.step}
+                      </span>
+                    )}
                     <span>{tab.icon}</span>
-                    <span>{tab.label}</span>
+                    <span className="flex-1">{tab.label}</span>
                     {disabledReason && (
-                      <span className="ml-auto text-xs text-gray-600">{disabledReason}</span>
+                      <span className="text-xs text-gray-600">{disabledReason}</span>
+                    )}
+                    {/* Version status for firmware tab */}
+                    {tab.id === 'firmware' && isConnected && deviceVersion && (
+                      <span className={`text-xs ${firmwareUpToDate ? 'text-green-500' : 'text-yellow-500'}`}>
+                        {firmwareUpToDate ? 'Up to date' : 'Update available'}
+                      </span>
                     )}
                   </button>
                 );
@@ -426,6 +525,8 @@ function App() {
                 <FirmwareInstall
                   isSerialConnected={isConnected}
                   onDisconnect={disconnect}
+                  deviceVersion={deviceVersion}
+                  latestVersion={latestVersion}
                 />
               )}
             </div>

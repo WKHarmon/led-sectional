@@ -27,6 +27,15 @@ jobs:
       - name: Build firmware
         run: |
           cd firmware
+          # Extract version from tag (v2.1.0 -> 2.1.0), default to "dev" for manual builds
+          if [[ "${{ github.ref_name }}" == v* ]]; then
+            VERSION="${{ github.ref_name }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION="dev"
+          fi
+          echo "Building with FIRMWARE_VERSION=$VERSION"
+          export PLATFORMIO_BUILD_FLAGS="-DFIRMWARE_VERSION='\"$VERSION\"'"
           pio run -e d1_mini_lite
 
       - name: Prepare firmware binaries

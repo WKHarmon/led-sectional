@@ -17,7 +17,8 @@ void serialCmdInit() {
     Serial.begin(SERIAL_BAUD);
     delay(100);
     Serial.println();
-    Serial.println("LED Sectional v2.0");
+    Serial.print("LED Sectional v");
+    Serial.println(FIRMWARE_VERSION);
     Serial.println("Serial command interface ready");
 }
 
@@ -35,6 +36,7 @@ void serialCmdSendStatus() {
     JsonDocument doc;
 
     doc["status"] = "ok";
+    doc["firmware_version"] = FIRMWARE_VERSION;
     doc["wifi_connected"] = wifiIsConnected();
     doc["wifi_ssid"] = wifiGetSSID();
     doc["ip_address"] = wifiGetIP();
