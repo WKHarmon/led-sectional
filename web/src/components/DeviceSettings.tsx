@@ -43,6 +43,7 @@ export function DeviceSettings({
       requestInterval: config.requestInterval,
       loopInterval: config.loopInterval,
       dataPin: config.dataPin,
+      colorOrder: config.colorOrder,
       mqttEnabled: config.mqttEnabled,
       mqttBroker: config.mqttBroker,
       mqttPort: config.mqttPort,
@@ -400,6 +401,27 @@ export function DeviceSettings({
               </select>
               <p className="mt-1 text-xs text-gray-500">
                 Only change this if you have an older board with LEDs on a different pin.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">
+                LED Color Order
+              </label>
+              <select
+                value={localConfig.colorOrder || 'RGB'}
+                onChange={(e) => updateConfig('colorOrder', e.target.value)}
+                className="w-full bg-gray-700 rounded-lg px-3 py-2"
+              >
+                <option value="RGB">RGB (WS2811)</option>
+                <option value="GRB">GRB (WS2812/WS2812B)</option>
+                <option value="BRG">BRG</option>
+                <option value="RBG">RBG</option>
+                <option value="GBR">GBR</option>
+                <option value="BGR">BGR</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                If colors appear wrong (e.g., red shows as green), try a different order.
               </p>
             </div>
 

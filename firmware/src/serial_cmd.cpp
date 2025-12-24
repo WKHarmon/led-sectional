@@ -145,6 +145,7 @@ static void processCommand(const String& cmdJson) {
                 config.loopInterval = cfg["loopInterval"];
             }
             if (cfg["dataPin"].is<int>()) config.dataPin = cfg["dataPin"];
+            if (cfg["colorOrder"].is<const char*>()) config.colorOrder = cfg["colorOrder"].as<String>();
 
             // MQTT settings
             bool mqttChanged = false;
@@ -180,6 +181,12 @@ static void processCommand(const String& cmdJson) {
             if (config.loopInterval < 50) config.loopInterval = 50;  // Min 50ms
             if (config.loopInterval > 60000) config.loopInterval = 60000;  // Max 1 minute
             if (config.dataPin != 5 && config.dataPin != 14) config.dataPin = 14;  // Only GPIO 5 or 14 supported
+            // Validate colorOrder - must be one of the supported values
+            if (config.colorOrder != "RGB" && config.colorOrder != "GRB" &&
+                config.colorOrder != "BRG" && config.colorOrder != "RBG" &&
+                config.colorOrder != "GBR" && config.colorOrder != "BGR") {
+                config.colorOrder = "RGB";  // Default to RGB if invalid
+            }
             if (config.minBrightness < 0) config.minBrightness = 0;
             if (config.minBrightness > 255) config.minBrightness = 255;
             if (config.maxBrightness < 0) config.maxBrightness = 0;

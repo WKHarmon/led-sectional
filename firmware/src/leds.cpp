@@ -21,6 +21,42 @@ static std::vector<WindyLed> windyLeds;
 static unsigned long windAlternateLastSwitch = 0;
 static bool windAlternateShowYellow = false;  // false = category color, true = yellow
 
+// Cached color order for fast lookup (avoids string comparison every color set)
+static uint8_t colorOrderMode = 0;  // 0=RGB, 1=GRB, 2=BRG, 3=RBG, 4=GBR, 5=BGR
+
+// Parse color order string to mode number
+static void updateColorOrderMode(const String& colorOrder) {
+    if (colorOrder == "GRB") colorOrderMode = 1;
+    else if (colorOrder == "BRG") colorOrderMode = 2;
+    else if (colorOrder == "RBG") colorOrderMode = 3;
+    else if (colorOrder == "GBR") colorOrderMode = 4;
+    else if (colorOrder == "BGR") colorOrderMode = 5;
+    else colorOrderMode = 0;  // RGB default
+}
+
+// Transform logical RGB color to the order expected by the LED strip
+// FastLED with RGB template sends r,g,b bytes in order
+// If strip expects different order, we pre-swap so it displays correctly
+static CRGB applyColorOrder(CRGB color) {
+    switch (colorOrderMode) {
+        case 1: return CRGB(color.g, color.r, color.b);  // GRB
+        case 2: return CRGB(color.b, color.r, color.g);  // BRG
+        case 3: return CRGB(color.r, color.b, color.g);  // RBG
+        case 4: return CRGB(color.g, color.b, color.r);  // GBR
+        case 5: return CRGB(color.b, color.g, color.r);  // BGR
+        default: return color;  // RGB - no change
+    }
+}
+
+// Helper to add LEDs with specified pin
+static void addLedsWithPin(int pin, int count) {
+    if (pin == 5) {
+        FastLED.addLeds<WS2811, 5, RGB>(leds, count).setCorrection(TypicalLEDStrip);
+    } else {
+        FastLED.addLeds<WS2811, 14, RGB>(leds, count).setCorrection(TypicalLEDStrip);
+    }
+}
+
 void ledsInit() {
     Config& config = getConfig();
     numLeds = config.airports.size();
@@ -30,18 +66,15 @@ void ledsInit() {
         Serial.printf("Warning: Capping LEDs at %d (configured %d)\n", MAX_LEDS, config.airports.size());
     }
 
-    // Initialize FastLED with appropriate pin based on configuration
-    // GPIO 5 (D1) for old kits, GPIO 14 (D5) for new kits
-    if (config.dataPin == 5) {
-        FastLED.addLeds<WS2811, 5, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
-    } else {
-        // Default to GPIO 14 for new kits
-        FastLED.addLeds<WS2811, 14, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
-    }
+    // Set up color order transformation
+    updateColorOrderMode(config.colorOrder);
+
+    // Initialize FastLED with pin
+    addLedsWithPin(config.dataPin, numLeds);
     FastLED.setBrightness(config.brightness);
 
-    Serial.printf("LEDs initialized: %d LEDs on GPIO %d at brightness %d\n",
-                  numLeds, config.dataPin, config.brightness);
+    Serial.printf("LEDs initialized: %d LEDs on GPIO %d, color order %s, brightness %d\n",
+                  numLeds, config.dataPin, config.colorOrder.c_str(), config.brightness);
 }
 
 void ledsUpdateCount(int count) {
@@ -55,12 +88,11 @@ void ledsUpdateCount(int count) {
     lightningLeds.clear();
     windyLeds.clear();
 
-    // Re-initialize with appropriate pin
-    if (config.dataPin == 5) {
-        FastLED.addLeds<WS2811, 5, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
-    } else {
-        FastLED.addLeds<WS2811, 14, RGB>(leds, numLeds).setCorrection(TypicalLEDStrip);
-    }
+    // Update color order in case it changed
+    updateColorOrderMode(config.colorOrder);
+
+    // Re-initialize with pin
+    addLedsWithPin(config.dataPin, numLeds);
 }
 
 CRGB ledsGetCategoryColor(const String& category, int windSpeed, int gusts) {
@@ -108,22 +140,22 @@ void ledsSetFlightCategory(int index, const String& category, int windSpeed, int
         }
 
         // Set to category color initially, add to windy list for alternation
-        leds[index] = categoryColor;
+        leds[index] = applyColorOrder(categoryColor);
         ledsAddWindy(index, categoryColor);
     } else {
         // Normal mode: use ledsGetCategoryColor which returns yellow for windy VFR
         CRGB color = ledsGetCategoryColor(category, windSpeed, gusts);
-        leds[index] = color;
+        leds[index] = applyColorOrder(color);
     }
 }
 
 void ledsSetColor(int index, CRGB color) {
     if (index < 0 || index >= numLeds) return;
-    leds[index] = color;
+    leds[index] = applyColorOrder(color);
 }
 
 void ledsSetAll(CRGB color) {
-    fill_solid(leds, numLeds, color);
+    fill_solid(leds, numLeds, applyColorOrder(color));
 }
 
 void ledsClear() {
@@ -194,14 +226,14 @@ bool ledsDoLightning() {
         // Bounds check in case LED count changed
         if (index < 0 || index >= numLeds) continue;
         lightningOriginalColors[index] = leds[index];
-        leds[index] = COLOR_LIGHTNING;
+        leds[index] = applyColorOrder(COLOR_LIGHTNING);
     }
 
     // Show white flash
     ledsRefresh();
     delay(25);
 
-    // Restore original colors from matching indices
+    // Restore original colors from matching indices (already transformed)
     for (int index : lightningLeds) {
         // Bounds check in case LED count changed
         if (index < 0 || index >= numLeds) continue;
@@ -220,22 +252,22 @@ void ledsSetLegend() {
         const String& code = config.airports[i];
 
         if (code == "VFR") {
-            leds[i] = COLOR_VFR;
+            leds[i] = applyColorOrder(COLOR_VFR);
         } else if (code == "MVFR") {
-            leds[i] = COLOR_MVFR;
+            leds[i] = applyColorOrder(COLOR_MVFR);
         } else if (code == "IFR") {
-            leds[i] = COLOR_IFR;
+            leds[i] = applyColorOrder(COLOR_IFR);
         } else if (code == "LIFR") {
-            leds[i] = COLOR_LIFR;
+            leds[i] = applyColorOrder(COLOR_LIFR);
         } else if (code == "WVFR") {
-            leds[i] = COLOR_WVFR;
+            leds[i] = applyColorOrder(COLOR_WVFR);
         } else if (code == "WBNK") {
             // Wind blink demo: alternates between VFR green and WVFR yellow
-            leds[i] = COLOR_VFR;
+            leds[i] = applyColorOrder(COLOR_VFR);
             ledsAddWindy(i, COLOR_VFR);
         } else if (code == "LTNG") {
             // Test lightning: show VFR color and add to lightning list
-            leds[i] = COLOR_VFR;
+            leds[i] = applyColorOrder(COLOR_VFR);
             ledsAddLightning(i);
         }
         // NULL entries remain at whatever color they were (usually black)
@@ -282,9 +314,9 @@ void ledsDoWindAlternate() {
             if (wl.index < 0 || wl.index >= numLeds) continue;
 
             if (windAlternateShowYellow) {
-                leds[wl.index] = COLOR_WVFR;  // Yellow
+                leds[wl.index] = applyColorOrder(COLOR_WVFR);  // Yellow
             } else {
-                leds[wl.index] = wl.categoryColor;  // Original category color
+                leds[wl.index] = applyColorOrder(wl.categoryColor);  // Original category color
             }
         }
 
