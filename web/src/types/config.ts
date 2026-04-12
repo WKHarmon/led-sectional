@@ -31,6 +31,7 @@ export interface DeviceConfig {
   mqttUsername: string;
   mqttPassword: string;
   powerOn: boolean;
+  noDataColor: string;
   airports: string[];
 }
 
@@ -119,5 +120,6 @@ export const DEFAULT_CONFIG: DeviceConfig = {
   mqttUsername: '',
   mqttPassword: '',
   powerOn: true,
+  noDataColor: '#000000',
   airports: [],
 };

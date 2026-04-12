@@ -50,6 +50,7 @@ export function DeviceSettings({
       mqttUsername: config.mqttUsername,
       mqttPassword: config.mqttPassword,
       powerOn: config.powerOn,
+      noDataColor: config.noDataColor,
     });
     setHasChanges(false);
   }, [config]);
@@ -422,6 +423,34 @@ export function DeviceSettings({
               </select>
               <p className="mt-1 text-xs text-gray-500">
                 If colors appear wrong (e.g., red shows as green), try a different order.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">
+                No Weather Data Color
+              </label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  value={localConfig.noDataColor || '#000000'}
+                  onChange={(e) => updateConfig('noDataColor', e.target.value)}
+                  className="h-10 w-14 bg-gray-700 rounded border border-gray-600 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={localConfig.noDataColor || '#000000'}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    updateConfig('noDataColor', val);
+                  }}
+                  placeholder="#000000"
+                  maxLength={7}
+                  className="flex-1 bg-gray-700 rounded-lg px-3 py-2 font-mono"
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Color shown for airports with no valid weather report. #000000 (black) turns the LED off.
               </p>
             </div>
 

@@ -161,6 +161,7 @@ String configToJson(const Config& config) {
     doc["mqttUsername"] = config.mqttUsername;
     doc["mqttPassword"] = config.mqttPassword;
     doc["powerOn"] = config.powerOn;
+    doc["noDataColor"] = config.noDataColor;
 
     JsonArray airportsArray = doc["airports"].to<JsonArray>();
     for (const String& airport : config.airports) {
@@ -206,6 +207,7 @@ bool configFromJson(const String& json, Config& config) {
     config.mqttUsername = doc["mqttUsername"] | DEFAULT_MQTT_USERNAME;
     config.mqttPassword = doc["mqttPassword"] | DEFAULT_MQTT_PASSWORD;
     config.powerOn = doc["powerOn"] | DEFAULT_POWER_ON;
+    config.noDataColor = doc["noDataColor"] | DEFAULT_NO_DATA_COLOR;
 
     // Load airports array
     config.airports.clear();

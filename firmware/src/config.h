@@ -41,6 +41,7 @@
 #define DEFAULT_MQTT_USERNAME ""
 #define DEFAULT_MQTT_PASSWORD ""
 #define DEFAULT_POWER_ON true
+#define DEFAULT_NO_DATA_COLOR "#000000"  // Black (LED off) when no weather data
 
 // WiFi reset button
 #define WIFI_RESET_PIN 12  // GPIO12 (D6 on D1 Mini)
@@ -94,6 +95,9 @@ struct Config {
     // Power state (controlled via MQTT or web)
     bool powerOn;
 
+    // Color for airports with no weather data (hex string, e.g. "#FFFFFF")
+    String noDataColor;
+
     // Constructor with defaults
     Config() {
         version = CONFIG_VERSION;
@@ -120,6 +124,7 @@ struct Config {
         mqttUsername = DEFAULT_MQTT_USERNAME;
         mqttPassword = DEFAULT_MQTT_PASSWORD;
         powerOn = DEFAULT_POWER_ON;
+        noDataColor = DEFAULT_NO_DATA_COLOR;
     }
 
     // Get number of LEDs (derived from airports size)

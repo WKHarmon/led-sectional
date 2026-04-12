@@ -85,6 +85,7 @@ void serialCmdSendConfig() {
     cfg["mqttUsername"] = config.mqttUsername;
     cfg["mqttPassword"] = config.mqttPassword;
     cfg["powerOn"] = config.powerOn;
+    cfg["noDataColor"] = config.noDataColor;
 
     JsonArray airports = cfg["airports"].to<JsonArray>();
     for (const String& airport : config.airports) {
@@ -170,6 +171,7 @@ static void processCommand(const String& cmdJson) {
             if (cfg["powerOn"].is<bool>()) {
                 config.powerOn = cfg["powerOn"];
             }
+            if (cfg["noDataColor"].is<const char*>()) config.noDataColor = cfg["noDataColor"].as<String>();
 
             // Validate and clamp config values
             if (config.brightness < 0) config.brightness = 0;
@@ -186,6 +188,21 @@ static void processCommand(const String& cmdJson) {
                 config.colorOrder != "BRG" && config.colorOrder != "RBG" &&
                 config.colorOrder != "GBR" && config.colorOrder != "BGR") {
                 config.colorOrder = "RGB";  // Default to RGB if invalid
+            }
+            // Validate noDataColor - must be "#" followed by 6 hex digits
+            {
+                String c = config.noDataColor;
+                bool valid = c.length() == 7 && c.charAt(0) == '#';
+                if (valid) {
+                    for (int i = 1; i < 7; i++) {
+                        char ch = c.charAt(i);
+                        if (!((ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'F') || (ch >= 'a' && ch <= 'f'))) {
+                            valid = false;
+                            break;
+                        }
+                    }
+                }
+                if (!valid) config.noDataColor = DEFAULT_NO_DATA_COLOR;
             }
             if (config.minBrightness < 0) config.minBrightness = 0;
             if (config.minBrightness > 255) config.minBrightness = 255;
@@ -208,6 +225,9 @@ static void processCommand(const String& cmdJson) {
 
             // Save to flash
             if (configSave(config)) {
+                // Refresh cached LED config (color order, no-data color)
+                ledsUpdateConfig();
+
                 // Apply brightness change immediately (if power is on)
                 if (config.powerOn) {
                     ledsSetBrightness(config.brightness);
