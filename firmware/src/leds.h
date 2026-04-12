@@ -16,7 +16,7 @@
 #define COLOR_IFR     CRGB::Red
 #define COLOR_LIFR    CRGB::Magenta
 #define COLOR_WVFR    CRGB::Yellow    // VFR with high winds
-#define COLOR_UNKNOWN CRGB::Black
+// COLOR_UNKNOWN is now configurable via noDataColor setting - use ledsGetNoDataColor()
 
 // Status indicator colors
 #define COLOR_WIFI_CONNECTING CRGB::Orange
@@ -89,7 +89,13 @@ void ledsDoWindAlternate();
 // Set legend LEDs (VFR, MVFR, IFR, LIFR, WVFR indicators)
 void ledsSetLegend();
 
+// Refresh cached config values (color order, no-data color) without reinitializing LEDs
+void ledsUpdateConfig();
+
 // Get the CRGB color for a flight category
 CRGB ledsGetCategoryColor(const String& category, int windSpeed = 0, int gusts = 0);
+
+// Get the configured no-data color (parsed from hex string in config)
+CRGB ledsGetNoDataColor();
 
 #endif // LEDS_H

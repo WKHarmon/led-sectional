@@ -21,6 +21,23 @@ static std::vector<WindyLed> windyLeds;
 static unsigned long windAlternateLastSwitch = 0;
 static bool windAlternateShowYellow = false;  // false = category color, true = yellow
 
+// Cached no-data color (parsed from config hex string)
+static CRGB noDataColor = CRGB::Black;
+
+// Parse a hex color string like "#FF00AA" or "FF00AA" into a CRGB
+static CRGB parseHexColor(const String& hex) {
+    String h = hex;
+    if (h.startsWith("#")) h = h.substring(1);
+    if (h.length() != 6) return CRGB::Black;
+    unsigned long val = strtoul(h.c_str(), NULL, 16);
+    return CRGB((val >> 16) & 0xFF, (val >> 8) & 0xFF, val & 0xFF);
+}
+
+// Update cached no-data color from config
+static void updateNoDataColor(const String& hexColor) {
+    noDataColor = parseHexColor(hexColor);
+}
+
 // Cached color order for fast lookup (avoids string comparison every color set)
 static uint8_t colorOrderMode = 0;  // 0=RGB, 1=GRB, 2=BRG, 3=RBG, 4=GBR, 5=BGR
 
@@ -66,8 +83,9 @@ void ledsInit() {
         Serial.printf("Warning: Capping LEDs at %d (configured %d)\n", MAX_LEDS, config.airports.size());
     }
 
-    // Set up color order transformation
+    // Set up color order transformation and no-data color
     updateColorOrderMode(config.colorOrder);
+    updateNoDataColor(config.noDataColor);
 
     // Initialize FastLED with pin
     addLedsWithPin(config.dataPin, numLeds);
@@ -88,11 +106,18 @@ void ledsUpdateCount(int count) {
     lightningLeds.clear();
     windyLeds.clear();
 
-    // Update color order in case it changed
+    // Update color order and no-data color in case they changed
     updateColorOrderMode(config.colorOrder);
+    updateNoDataColor(config.noDataColor);
 
     // Re-initialize with pin
     addLedsWithPin(config.dataPin, numLeds);
+}
+
+void ledsUpdateConfig() {
+    Config& config = getConfig();
+    updateColorOrderMode(config.colorOrder);
+    updateNoDataColor(config.noDataColor);
 }
 
 CRGB ledsGetCategoryColor(const String& category, int windSpeed, int gusts) {
@@ -112,7 +137,7 @@ CRGB ledsGetCategoryColor(const String& category, int windSpeed, int gusts) {
         return COLOR_VFR;
     }
 
-    return COLOR_UNKNOWN;
+    return noDataColor;
 }
 
 void ledsSetFlightCategory(int index, const String& category, int windSpeed, int gusts) {
@@ -136,7 +161,7 @@ void ledsSetFlightCategory(int index, const String& category, int windSpeed, int
         } else if (category == "VFR") {
             categoryColor = COLOR_VFR;
         } else {
-            categoryColor = COLOR_UNKNOWN;
+            categoryColor = noDataColor;
         }
 
         // Set to category color initially, add to windy list for alternation
@@ -159,7 +184,11 @@ void ledsSetAll(CRGB color) {
 }
 
 void ledsClear() {
-    fill_solid(leds, numLeds, CRGB::Black);
+    fill_solid(leds, numLeds, applyColorOrder(noDataColor));
+}
+
+CRGB ledsGetNoDataColor() {
+    return noDataColor;
 }
 
 void ledsRefresh() {
@@ -269,8 +298,9 @@ void ledsSetLegend() {
             // Test lightning: show VFR color and add to lightning list
             leds[i] = applyColorOrder(COLOR_VFR);
             ledsAddLightning(i);
+        } else if (code == "NULL") {
+            leds[i] = CRGB::Black;  // NULL is always off regardless of noDataColor
         }
-        // NULL entries remain at whatever color they were (usually black)
     }
 }
 
