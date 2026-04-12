@@ -4,14 +4,13 @@ updates:
     directory: "/web"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
-      major:
-        update-types:
-          - "major"
+        patterns:
+          - "*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
